@@ -1,0 +1,13 @@
+flowchart TD
+    A["STEP 7 Export<br/>Exported/*.AWL + Exported/*.sdf"] --> B["Split<br/>awl-text-sync split --workspace ."]
+    B --> C["Editable Workspace<br/>Project/Blocks + Project/Symbols"]
+    C --> D["Edit Blocks<br/>change one .awl per block"]
+    D --> E["Validate<br/>awl-text-sync validate --workspace ."]
+
+    E -->|ok| F["Build Monolith<br/>Build/Monolith/ALL_BLOCKS.AWL"]
+    E -->|ok| G["Build Split Import<br/>Build/SplitImport/"]
+    E -->|optional| H["Call Graph Report<br/>Build/Reports/"]
+    E -->|fix errors| D
+
+    F --> I["Import back into STEP 7"]
+    G --> I

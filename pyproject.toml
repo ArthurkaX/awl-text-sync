@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "awl-text-sync"
+version = "0.1.0"
+description = "STEP 7 AWL workspace splitter and builder"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+keywords = ["step7", "siemens", "awl", "stl", "plc"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Environment :: Win32 (MS Windows)",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Manufacturing",
+    "Operating System :: Microsoft :: Windows",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Build Tools",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+[project.scripts]
+awl-text-sync = "awl_text_sync.main:main"
+awl-text-sync-ui = "awl_text_sync.ui:main"
+s7p-sync = "awl_text_sync.main:main"
+s7p-sync-ui = "awl_text_sync.ui:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-p no:cacheprovider"
