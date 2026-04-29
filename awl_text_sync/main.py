@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import subprocess
 import sys
 import webbrowser
 from pathlib import Path
@@ -10,6 +11,7 @@ try:
     from .call_graph import build_call_graph, default_call_graph_report_path, write_call_graph_report
     from .builder import build_monolith, build_split_import
     from .config import resolve_workspace
+    from .plccheck_extra import PlccheckError, run_plccheck_check
     from .splitter import split_exported_workspace
     from .ui import launch_ui
     from .validator import validate_workspace
@@ -20,6 +22,7 @@ except ImportError:  # pragma: no cover - script/PyInstaller fallback
     from awl_text_sync.builder import build_monolith, build_split_import
     from awl_text_sync.config import resolve_workspace
     from awl_text_sync.splitter import split_exported_workspace
+    from awl_text_sync.plccheck_extra import PlccheckError, run_plccheck_check
     from awl_text_sync.ui import launch_ui
     from awl_text_sync.parser import ParseError
     from awl_text_sync.validator import validate_workspace
@@ -46,6 +49,13 @@ def build_parser() -> argparse.ArgumentParser:
         "--open-call-graph",
         action="store_true",
         help="Open the call graph report in the default browser after writing it",
+    )
+    validate_parser.add_argument(
+        "--plccheck-root",
+        type=Path,
+        default=None,
+        help="After native validate, run `plccheck check` on this folder (must contain .plc.json); "
+        "optional; requires Node/npm if plccheck is not on PATH",
     )
     subparsers.add_parser("build-split", help="Build split import output under Build/SplitImport/")
     subparsers.add_parser("build-monolith", help="Build ALL_BLOCKS.AWL under Build/Monolith/")
@@ -81,6 +91,24 @@ def main() -> int:
                 print(f"Wrote call graph report to {report_path}")
                 if getattr(args, "open_call_graph", False):
                     webbrowser.open(report_path.resolve().as_uri())
+        if args.plccheck_root is not None:
+            try:
+                proc = run_plccheck_check(args.plccheck_root)
+            except PlccheckError as exc:
+                print(str(exc), file=sys.stderr)
+                return 1
+            except OSError as exc:
+                print(f"plccheck failed to start: {exc}", file=sys.stderr)
+                return 1
+            except subprocess.TimeoutExpired:
+                print("plccheck check timed out", file=sys.stderr)
+                return 1
+            if proc.stdout:
+                print(proc.stdout, end="")
+            if proc.stderr:
+                print(proc.stderr, end="", file=sys.stderr)
+            if proc.returncode != 0:
+                return proc.returncode
         return 0
 
     if args.command == "build-split":
