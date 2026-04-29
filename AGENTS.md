@@ -24,16 +24,18 @@ Treat **`Build/*` as generated**; edit **`Project/`** and keep **`Exported/`** a
 
 ## CLI (workspace root = `.`)
 
+`--workspace` is a **global** option and must appear **before** the subcommand (`split`, `validate`, `build-split`, …).
+
 | Command | Purpose |
 |---------|---------|
-| `awl-text-sync split --workspace .` | Create `Project/Blocks/` + `Project/Symbols/` from `Exported/` |
-| `awl-text-sync validate --workspace .` | Validate blocks + symbols |
-| `awl-text-sync validate --workspace . --call-graph` | Also write `Build/Reports/call_graph.html` |
-| `awl-text-sync validate --workspace . --call-graph --open-call-graph` | Open call graph in default browser |
-| `awl-text-sync validate --workspace . --plccheck-root PATH` | After native validate, run optional `plccheck check` on a TIA-style PLC folder (`.plc.json`); see `docs/siemens_plccheck_experiment.md` |
-| `awl-text-sync build-split --workspace .` | Write split import under `Build/SplitImport/` |
-| `awl-text-sync build-monolith --workspace .` | Write `Build/Monolith/` monolith |
-| `awl-text-sync ui` | Desktop UI (same actions) |
+| `awl-text-sync --workspace . split` | Create `Project/Blocks/` + `Project/Symbols/` from `Exported/` |
+| `awl-text-sync --workspace . validate` | Validate blocks + symbols |
+| `awl-text-sync --workspace . validate --call-graph` | Also write `Build/Reports/call_graph.html` |
+| `awl-text-sync --workspace . validate --call-graph --open-call-graph` | Open call graph in default browser |
+| `awl-text-sync --workspace . validate --plccheck-root PATH` | After native validate, run optional `plccheck check` on a TIA-style PLC folder (`.plc.json`); see `docs/siemens_plccheck_experiment.md` |
+| `awl-text-sync --workspace . build-split` | Write split import under `Build/SplitImport/` |
+| `awl-text-sync --workspace . build-monolith` | Write `Build/Monolith/` monolith |
+| `awl-text-sync --workspace . ui` | Desktop UI (same actions) |
 
 Aliases: `s7p-sync`, `awl-text-sync-ui`, `s7p-sync-ui` (see `pyproject.toml`).
 

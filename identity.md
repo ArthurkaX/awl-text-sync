@@ -27,6 +27,7 @@ Load the skill by reading `SKILL.md` under the folder when the request matches.
 |------------------------|--------------|--------|
 | **`/KB`**; search local technical manuals; “what does the STL manual say”; manual-backed instruction semantics | `.cursor/skills/project-knowledgebase/` | Query `.cursor/knowledgebase/` via `indexes/sections.jsonl` then section `.md` |
 | **`/prime`**, **`/debrief`**, **`/sign-off`**; fresh chat priming; handoff; end-of-session doc audit | `.cursor/skills/project-session-handoff/` | Read `SKILL.md`; updates `progress.md` / `AGENTS.md` revision on sign-off |
+| **LSP vs CLI reality** on `.awl`; **plccheck** / Dynamic Siemens; **trust-lsp** vs Classic STL; agent **repair-loop** gates; hybrid TIA + Classic | `.cursor/skills/siemens-awl-stl-agent-handoff/` | Authority order: SIMATIC > `awl-text-sync validate` > optional `plccheck`; no pretend pure-AWL compiler LSP |
 | Explain / refactor / create FB, FC, DB, OB; uploads `.awl`; “what does this STL do”; SIMATIC / PCS7 maintenance style | `.cursor/skills/awl-step7/` | Workflow + modes; pairs with safety for production logic |
 | Run / simulate / test / verify PLC logic; “does this work”; assertions on outputs | `.cursor/skills/awlsim-runner/` | Step 0: `stl_precheck.py` before awlsim |
 | Safety interlocks, fault reset, overflow guards, pre-download checklist language | `.cursor/skills/awl-safety-critical/` | Passive rules; apply via **awl-step7** analysis/authoring |

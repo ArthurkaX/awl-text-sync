@@ -45,21 +45,21 @@ python -m awl_text_sync ui
 2. Split the exported project into editable files:
 
 ```powershell
-awl-text-sync split --workspace .
+awl-text-sync --workspace . split
 ```
 
 3. Edit the generated files in `Project/Blocks/` and `Project/Symbols/`.
 4. Validate the workspace before rebuilding:
 
 ```powershell
-awl-text-sync validate --workspace .
+awl-text-sync --workspace . validate
 ```
 
 5. Build STEP 7 import output when needed:
 
 ```powershell
-awl-text-sync build-split --workspace .
-awl-text-sync build-monolith --workspace .
+awl-text-sync --workspace . build-split
+awl-text-sync --workspace . build-monolith
 ```
 
 6. Import the rebuilt output back into STEP 7 and compile there.
@@ -92,14 +92,16 @@ The UI is intended for quick local operation near the equipment, without requiri
 
 ## Commands
 
+`--workspace` is a **global** option and must come **before** the subcommand (`split`, `validate`, `build-split`, …).
+
 ```powershell
-awl-text-sync split --workspace .
-awl-text-sync validate --workspace .
-awl-text-sync validate --workspace . --call-graph
-awl-text-sync validate --workspace . --call-graph --open-call-graph
-awl-text-sync build-split --workspace .
-awl-text-sync build-monolith --workspace .
-awl-text-sync ui
+awl-text-sync --workspace . split
+awl-text-sync --workspace . validate
+awl-text-sync --workspace . validate --call-graph
+awl-text-sync --workspace . validate --call-graph --open-call-graph
+awl-text-sync --workspace . build-split
+awl-text-sync --workspace . build-monolith
+awl-text-sync --workspace . ui
 ```
 
 GUI entry points:

@@ -1,0 +1,51 @@
+{
+  "skill": "siemens-awl-stl-agent-handoff",
+  "version": 1,
+  "prompts": [
+    {
+      "id": "validate-fb-block",
+      "category": "agent_style",
+      "prompt": "I edited an FB body in Project/Blocks under awl-text-sync. List the exact PowerShell commands to gate before I import into STEP 7, and state what is authoritative if validate passes but SIMATIC errors.",
+      "expects_contains": [
+        "awl-text-sync validate",
+        "STEP 7",
+        "compile",
+        "authority"
+      ]
+    },
+    {
+      "id": "trust-lsp-on-awl",
+      "category": "misconception",
+      "prompt": "Can I use truST trust-lsp as the semantic checker for Siemens Classic .AWL STL exports? What should we use instead in Cursor agents?",
+      "expects_contains": [
+        "IEC",
+        "awl-text-sync validate",
+        "SIMATIC",
+        "not"
+      ]
+    },
+    {
+      "id": "plccheck-ci",
+      "category": "hybrid_tooling",
+      "prompt": "We have only Project/Blocks from STEP 7 export — no .plc.json. How should plccheck fit into CI, if at all? Mention license if recommending it.",
+      "expects_contains": [
+        "plccheck",
+        ".plc.json",
+        "CC-BY-NC",
+        "optional"
+      ]
+    },
+    {
+      "id": "lsp-vs-cli-agent",
+      "category": "agent_workflow",
+      "prompt": "Our coding agent doesn't run inside VS Code. How should the repair loop consume Siemens diagnostics for .awl — LSP or CLI — and why?",
+      "expects_contains": [
+        "CLI",
+        "validate",
+        "LSP",
+        "deterministic"
+      ]
+    }
+  ],
+  "notes": "Qualitative review only; score manually or extend with rubric. Assertions about exit codes: run repo pytest and demo scripts for objective checks."
+}
