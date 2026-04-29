@@ -1,0 +1,5 @@
+{
+  "name": "DemoPLC_Minimal",
+  "description": "Synthetic non-proprietary fixture for plccheck demo (CC-BY-NC plccheck license applies to the checker, not this JSON).",
+  "libraries": []
+}

@@ -58,13 +58,24 @@ class TestPlccheckExtra(unittest.TestCase):
                 stderr="",
             )
             with patch("awl_text_sync.plccheck_extra.shutil.which", return_value=None):
-                with patch("awl_text_sync.plccheck_extra.subprocess.run", return_value=fake) as run_mock:
-                    run_plccheck_check(root)
+                with patch("awl_text_sync.plccheck_extra._npx_executable", return_value="npx"):
+                    with patch("awl_text_sync.plccheck_extra.subprocess.run", return_value=fake) as run_mock:
+                        run_plccheck_check(root)
             run_mock.assert_called_once()
             self.assertEqual(
                 run_mock.call_args[0][0],
                 ["npx", "--yes", "plccheck", "check", str(root.resolve())],
             )
+
+    def test_run_plccheck_check_raises_when_no_plccheck_or_npx(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            (root / ".plc.json").write_text("{}", encoding="utf-8")
+            with patch("awl_text_sync.plccheck_extra.shutil.which", return_value=None):
+                with patch("awl_text_sync.plccheck_extra._npx_executable", return_value=None):
+                    with self.assertRaises(PlccheckError) as ctx:
+                        run_plccheck_check(root)
+            self.assertIn("npx", str(ctx.exception).lower())
 
 
 if __name__ == "__main__":

@@ -1,0 +1,13 @@
+TYPE UDT 1271
+
+TITLE =
+
+VERSION : 0.1
+
+  STRUCT
+
+   Field : INT ;
+
+  END_STRUCT ;
+
+END_TYPE

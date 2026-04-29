@@ -29,6 +29,7 @@ Treat **`Build/*` as generated**; edit **`Project/`** and keep **`Exported/`** a
 | `awl-text-sync split --workspace .` | Create `Project/Blocks/` + `Project/Symbols/` from `Exported/` |
 | `awl-text-sync validate --workspace .` | Validate blocks + symbols |
 | `awl-text-sync validate --workspace . --call-graph` | Also write `Build/Reports/call_graph.html` |
+| `awl-text-sync validate --workspace . --call-graph --open-call-graph` | Open call graph in default browser |
 | `awl-text-sync validate --workspace . --plccheck-root PATH` | After native validate, run optional `plccheck check` on a TIA-style PLC folder (`.plc.json`); see `docs/siemens_plccheck_experiment.md` |
 | `awl-text-sync build-split --workspace .` | Write split import under `Build/SplitImport/` |
 | `awl-text-sync build-monolith --workspace .` | Write `Build/Monolith/` monolith |
@@ -43,6 +44,7 @@ Aliases: `s7p-sync`, `awl-text-sync-ui`, `s7p-sync-ui` (see `pyproject.toml`).
 - Venv at repo root: `python -m venv .venv` then `.\.venv\Scripts\Activate.ps1`.
 - Editable install: `python -m pip install -e .`
 - Tests: `python -m pytest` from repo root (install `pytest` in the venv if needed).
+- Siemens `plccheck` demo: [`docs/siemens_plccheck_experiment.md`](docs/siemens_plccheck_experiment.md), `scripts/run_siemens_demo_D0.ps1`. Optional live checks: `$env:RUN_PLCCHECK_INTEGRATION='1'; python -m pytest tests/test_plccheck_integration_optional.py -v`.
 
 Python package code lives under [`awl_text_sync/`](awl_text_sync/).
 

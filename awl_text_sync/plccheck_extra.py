@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import shutil
 import subprocess
+import sys
 from pathlib import Path
 
 
@@ -13,6 +14,12 @@ class PlccheckError(Exception):
 
 def plc_root_has_config(plc_root: Path) -> bool:
     return (plc_root.resolve() / ".plc.json").is_file()
+
+
+def _npx_executable() -> str | None:
+    if sys.platform == "win32":
+        return shutil.which("npx.cmd") or shutil.which("npx")
+    return shutil.which("npx")
 
 
 def run_plccheck_check(plc_root: Path, *, timeout_sec: float = 300.0) -> subprocess.CompletedProcess[str]:
@@ -28,7 +35,13 @@ def run_plccheck_check(plc_root: Path, *, timeout_sec: float = 300.0) -> subproc
     if plccheck_exe:
         cmd = [plccheck_exe, "check", str(root)]
     else:
-        cmd = ["npx", "--yes", "plccheck", "check", str(root)]
+        npx = _npx_executable()
+        if not npx:
+            raise PlccheckError(
+                "Neither 'plccheck' nor 'npx' was found on PATH. "
+                "Install Node.js or add plccheck to PATH."
+            )
+        cmd = [npx, "--yes", "plccheck", "check", str(root)]
     return subprocess.run(
         cmd,
         capture_output=True,

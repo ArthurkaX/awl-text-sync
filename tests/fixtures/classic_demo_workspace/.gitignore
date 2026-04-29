@@ -1,0 +1,8 @@
+*
+!.gitignore
+!Exported/
+!Exported/**
+!Project/
+!Project/**
+!docs/
+!docs/**

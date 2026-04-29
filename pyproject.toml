@@ -38,3 +38,6 @@ s7p-sync-ui = "awl_text_sync.ui:main"
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-p no:cacheprovider"
+markers = [
+    "integration: optional tests that invoke Node plccheck (set RUN_PLCCHECK_INTEGRATION=1)",
+]
