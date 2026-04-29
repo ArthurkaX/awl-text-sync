@@ -1,0 +1,63 @@
+DATA_BLOCK "[DB_DescriptiveName]"
+TITLE =[DESCRIBE DATA THIS BLOCK HOLDS]
+//
+// Shared (Global) Data Block — accessible by any block in the project.
+// Typical uses: configuration setpoints, shared process values, SCADA interface.
+//
+// Access from STL:
+//   L     "[DB_DescriptiveName]".FieldName;
+//   T     "[DB_DescriptiveName]".FieldName;
+//
+AUTHOR : [Name]
+VERSION : 0.1
+
+
+STRUCT
+  Configuration : STRUCT 	
+   HighLimit : REAL ;	        //High alarm limit
+   LowLimit : REAL ;	        //Low alarm limit
+   Setpoint1 : REAL ;	        //Primary setpoint
+   Setpoint2 : REAL ;	        //Secondary setpoint
+   TimerPreset_s : INT ;	    //Timer preset in seconds
+   SpareConfig_1 : REAL ;	
+   SpareConfig_2 : REAL ;	
+  END_STRUCT ;	
+  ProcessValues : STRUCT 	
+   CurrentValue : REAL ;	    //Current process measurement
+   FilteredValue : REAL ;	    //Filtered / averaged value
+   PeakValue : REAL ;	        //Peak value recorded this period
+   TotalizedValue : REAL ;	    //Running total
+   SpareProcess_1 : REAL ;	
+  END_STRUCT ;	
+  Status : STRUCT 	
+   InRange : BOOL ;	            //Value within configured limits
+   HighAlarm : BOOL ;	        //High alarm active
+   LowAlarm : BOOL ;	        //Low alarm active
+   SensorFault : BOOL ;	        //Sensor fault detected
+   SpareStatus_1 : BOOL ;	
+   SpareStatus_2 : BOOL ;	
+   SpareStatus_3 : BOOL ;	
+   SpareStatus_4 : BOOL ;	
+   StatusWord : WORD ;	        //Packed status for SCADA
+  END_STRUCT ;	
+  SCADA : STRUCT 	
+   DisplayValue : REAL ;	    //Value for HMI display
+   AckButton : BOOL ;	        //Alarm acknowledge
+   ResetButton : BOOL ;	        //Reset button
+   SpareButton_1 : BOOL ;	
+   SpareSCADA_1 : REAL ;	
+  END_STRUCT ;	
+  DataArray : ARRAY  [1 .. 10 ] OF REAL ;	//Data history / trending array
+  SpareData : ARRAY  [1 .. 4 ] OF DWORD ;	//Reserved for future use
+END_STRUCT
+
+BEGIN
+  Configuration.HighLimit := [value];
+  Configuration.LowLimit := [value];
+  Configuration.Setpoint1 := [value];
+  Configuration.Setpoint2 := [value];
+  Configuration.TimerPreset_s := [value];
+  ProcessValues.CurrentValue := 0.000000e+000;
+  ProcessValues.FilteredValue := 0.000000e+000;
+  Status.StatusWord := W#16#0;
+END_DATA_BLOCK

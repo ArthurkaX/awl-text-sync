@@ -32,3 +32,15 @@ venv/
 .idea/
 Thumbs.db
 Desktop.ini
+
+# Large local manuals (keep skills/rules; omit indexed PDF extracts)
+.cursor/knowledgebase/
+
+# Secrets and local env
+.env
+.env.*
+!.env.example
+
+# Logs and OS clutter
+*.log
+.DS_Store

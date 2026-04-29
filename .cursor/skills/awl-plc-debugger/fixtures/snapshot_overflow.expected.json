@@ -1,0 +1,35 @@
+{
+  "fixture": "snapshot_overflow",
+  "expected_diagnosis": {
+    "decoded_values": {
+      "ACCU1_after_load_input": {
+        "raw_hex": "0x7F800000",
+        "ieee_754": "+Infinity",
+        "interpretation": "PowerMeter_KwH input has already overflowed before this network ran — likely a faulty meter reading or a sensor wraparound."
+      },
+      "ACCU1_after_subtract": {
+        "raw_hex": "0x7F800000",
+        "ieee_754": "+Infinity",
+        "interpretation": "+Inf − 1375.0 = +Inf. The subtraction propagates the overflow."
+      },
+      "STATUS_word": {
+        "raw_binary": "1010 0011",
+        "decoded": {
+          "BR": 1, "CC1": 0, "CC0": 1, "OV": 0, "OS": 0,
+          "OR": 0, "STA": 1, "RLO": 1, "/FC": 1
+        },
+        "note": "OV=0 here because IEEE 754 arithmetic on +Inf does NOT set the overflow flag — the result is a valid IEEE 754 special value. This is a R1 false-confidence trap: AN OV would not catch this."
+      }
+    },
+    "rule_violations": [
+      "R1 (overflow protection) — the network has T #Diff_kWh but no `AN OV; SAVE; CLR; A BR` follow-up. Even with the pattern, OV would not have caught this case because IEEE 754 silently produces +Inf rather than setting OV.",
+      "Stronger guard needed: explicit `==R` against +/-Inf, or upstream sanity-bound check on the input PowerMeter_KwH before subtraction."
+    ],
+    "verdict": "Abnormal. The R1 pattern alone is insufficient when the upstream input is already +Inf. Need stronger validation upstream OR an explicit `JUO` (jump-unordered) check after the arithmetic to catch IEEE 754 special values.",
+    "next_steps": [
+      "Route to awl-step7 Analysis Mode for the source FB: identify where PowerMeter_KwH is loaded from the meter and whether its raw analog value has range validation.",
+      "Recommend an improvement: range-bound check on the input (e.g., if PowerMeter_KwH > 1.0e9 then suspect overflow → fault).",
+      "Recommend adding `JUO Skip;` after each REAL arithmetic when input may be unbounded."
+    ]
+  }
+}

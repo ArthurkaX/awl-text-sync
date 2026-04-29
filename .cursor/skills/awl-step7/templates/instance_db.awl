@@ -1,0 +1,93 @@
+// ============================================================
+// INSTANCE DB for Function Block
+// ============================================================
+// An Instance DB stores the static (VAR) data for one specific
+// call of a Function Block. You need ONE Instance DB per call.
+//
+// Example: If FB "T2O_CompressorControl" is called once → 1 Instance DB
+//          If same FB called for 3 separate compressor banks → 3 Instance DBs
+//
+// The Instance DB structure is INHERITED from the FB's VAR section.
+// You do not define the structure here — only override initial values.
+// ============================================================
+
+DATA_BLOCK "[FBName]_[EquipmentTag]_DB"
+TITLE =Instance DB — [FBName] — [Equipment description]
+//
+// References FB: "[FBName]"
+// Equipment: [Equipment tag and description]
+//
+VERSION : 0.1
+"[FBName]"           // This line makes it an Instance DB for the named FB
+
+BEGIN
+// ---- Optional: override initial values from FB defaults ----
+// Only include lines where you want non-zero starting values.
+// Syntax: StructName.MemberName := value;
+
+  SCADA.Setpoint1 := [value];    // e.g. high level setpoint
+  SCADA.Setpoint2 := [value];    // e.g. low level setpoint
+
+// All other values default to 0 / FALSE
+END_DATA_BLOCK
+
+
+// ============================================================
+// HOW TO CREATE THIS INSTANCE DB IN SIMATIC MANAGER
+// (if not compiling from AWL source)
+// ============================================================
+//
+// Method A — Compile from AWL source (recommended):
+//   1. Include this file in your AWL source
+//   2. Import and compile in SIMATIC Manager
+//   3. Instance DB appears in Blocks folder
+//
+// Method B — Manual creation in SIMATIC Manager:
+//   1. In SIMATIC Manager, open your project
+//   2. Navigate to the Blocks folder
+//   3. Menu: Insert → S7 Block → Data Block  (or right-click → Insert New Object → Data Block)
+//   4. Enter the DB number in the Properties dialog → OK
+//   5. In the "New Data Block" dialog that opens:
+//      → Select "Data block referencing a function block"
+//      → In the dropdown, select "[FBName]"
+//   6. Click OK
+//   7. The Instance DB is created with the FB's full VAR structure
+//   8. Optional: Open DB (double-click) → switch to Data View to set initial values
+//
+// ============================================================
+// CALLING THE FB WITH THIS INSTANCE DB
+// ============================================================
+//
+// In OB1 or calling FB:
+//
+// NETWORK
+// TITLE =Call [FBName] for [equipment]
+//
+//       CALL  "[FBName]", "[FBName]_[EquipmentTag]_DB" (
+//            // Input parameters (VAR_INPUT) if declared:
+//            // InputParam  := source_value,
+//            // Output parameters (VAR_OUTPUT) if declared:
+//            // OutputParam := destination
+//            );
+//
+//       NOP   0;
+//
+// OR with absolute addressing (no Symbol Table needed):
+//
+//       CALL  FB [n], DB [m]
+//
+// ============================================================
+// IMPORTANT AFTER MODIFYING THE FB
+// ============================================================
+//
+// If you change the FB's VAR section (add/remove/rename variables):
+//   1. Recompile the FB source
+//   2. The Instance DB structure is now STALE
+//   3. Regenerate the Instance DB:
+//      - Method: Delete old DB, recreate using Method B above
+//      - OR: Right-click DB → Object Properties → Update DB
+//   4. Re-enter any initial values that were set
+//
+// A mismatched Instance DB causes WRONG data at wrong offsets — silent errors!
+//
+// ============================================================

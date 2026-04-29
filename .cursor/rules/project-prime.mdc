@@ -1,0 +1,13 @@
+---
+description: Prime every chat on AGENTS.md and identity.md for awl-text-sync
+alwaysApply: true
+---
+
+# Project priming (awl-text-sync)
+
+Before substantive work in this repository:
+
+1. Read **AGENTS.md** and **identity.md** at the repo root (Read tool or `@` attach).
+2. Do **not** load `learnings.md`, `decisions.md`, or `progress.md` unless the user asks or a handoff in AGENTS.md requires it.
+3. Prefer **PowerShell** on Windows for shell examples.
+4. When editing Python under `awl_text_sync/`, match existing style; AWL editing rules live in `docs/working_rules.md`.

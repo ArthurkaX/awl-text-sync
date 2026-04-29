@@ -1,0 +1,186 @@
+      FUNCTION_BLOCK "[AREA]_[EquipmentTag]"
+TITLE =[DESCRIBE WHAT THIS BLOCK CONTROLS]
+//
+// [AREA] [Equipment tag and description]
+//
+// I/O Assignments:
+// I [addr]  [Tag]   [Description]
+// Q [addr]  [Tag]   [Description]
+// PIW[addr] [Tag]   [Description]   // EN mnemonic — for DE projects use PEW
+// PQW[addr] [Tag]   [Description]   // EN mnemonic — for DE projects use PAW
+//
+// Fail-safe state on CPU STOP (R0):
+//   [Output 1]: [de-energized | last-value | <state>] — [why this is safe]
+//   [Output 2]: ...
+//
+AUTHOR : [Name]
+VERSION : 0.1
+
+
+VAR
+  SCADA : STRUCT
+   AutoMode_PB : BOOL ;	        //SCADA Auto mode request pushbutton
+   FaultReset_PB : BOOL ;	    //SCADA Fault reset pushbutton
+   ManualStart_PB : BOOL ;	    //SCADA Manual start pushbutton
+   ManualStop_PB : BOOL ;	    //SCADA Manual stop pushbutton
+   Spare1_4 : BOOL ;
+   Spare1_5 : BOOL ;
+   Spare1_6 : BOOL ;
+   Spare1_7 : BOOL ;
+   Setpoint1 : REAL ;	        //Operator setpoint 1 — units: [kPa | °C | %]
+   Setpoint2 : REAL ;	        //Operator setpoint 2 — units: [kPa | °C | %]
+   SpareReal_1 : REAL ;
+   SpareReal_2 : REAL ;
+  END_STRUCT ;
+  Control : STRUCT
+   AutoMode : BOOL ;	        //Automatic mode active
+   ManualMode : BOOL ;	        //Manual mode active
+   Device1_StartCmd : BOOL ;	//Device 1 start command
+   Device1_StopCmd : BOOL ;	    //Device 1 stop command
+   SpareControl_1 : BOOL ;
+   SpareControl_2 : BOOL ;
+   SpareControl_3 : BOOL ;
+   SpareControl_4 : BOOL ;
+  END_STRUCT ;
+  Interlocks : STRUCT
+   LevelHigh : BOOL ;	        //High level interlock active
+   LevelLow : BOOL ;	        //Low level interlock active
+   PressureHigh : BOOL ;	    //High pressure interlock active
+   SpareInterlock_1 : BOOL ;
+   SpareInterlock_2 : BOOL ;
+   SpareInterlock_3 : BOOL ;
+  END_STRUCT ;
+  Faults : STRUCT
+   RunFeedbackFault : BOOL ;	//Run feedback timeout fault
+   GeneralFault : BOOL ;	    //General fault — aggregated
+   SpareFault_1 : BOOL ;
+   SpareFault_2 : BOOL ;
+   SpareFault_3 : BOOL ;
+  END_STRUCT ;
+  PulseBits : ARRAY  [1 .. 16 ] OF BOOL ;	//Edge detection storage (R4 — one element per signal)
+  // IEC TON multi-instance timer (R8 — preferred over absolute T-numbers; avoids global timer conflicts)
+  RunFeedback_Timer : "TON" ;	    //Run-feedback timeout timer
+END_VAR
+VAR_TEMP
+  Temp_Real : REAL ;	        //Calculation intermediate (R6 — initialise before use)
+  Temp_Int : INT ;
+  TEMP_Dint : DINT ;
+END_VAR
+BEGIN
+NETWORK
+TITLE =Auto/Manual Mode Selection (R4 — edge detect on SCADA pushbuttons)
+
+      A     #SCADA.AutoMode_PB;
+      FP    #PulseBits[1];
+      S     #Control.AutoMode;
+      CLR   ;
+      =     #Control.ManualMode;
+
+NETWORK
+TITLE =High Level Interlock (R3 — hysteresis: set above SP, reset 5 units below)
+
+      A(    ;
+      L     "[DB_AnalogInputs]".[LevelTag].OUTV;
+      L     #SCADA.Setpoint1;
+      >=R   ;
+      )     ;
+      S     #Interlocks.LevelHigh;
+      A(    ;
+      L     #SCADA.Setpoint1;
+      L     5.000000e+000;
+      -R    ;
+      T     #Temp_Real;
+      AN    OV;            // R1 — overflow check
+      SAVE  ;
+      CLR   ;
+      A     BR;
+      )     ;
+      A(    ;
+      L     "[DB_AnalogInputs]".[LevelTag].OUTV;
+      L     #Temp_Real;
+      <R    ;
+      )     ;
+      R     #Interlocks.LevelHigh;
+      NOP   0;
+
+NETWORK
+TITLE =Low Level Interlock (R3 — hysteresis: set below SP, reset 5 units above)
+
+      A(    ;
+      L     "[DB_AnalogInputs]".[LevelTag].OUTV;
+      L     #SCADA.Setpoint2;
+      <=R   ;
+      )     ;
+      S     #Interlocks.LevelLow;
+      A(    ;
+      L     #SCADA.Setpoint2;
+      L     5.000000e+000;
+      +R    ;
+      T     #Temp_Real;
+      AN    OV;            // R1
+      SAVE  ;
+      CLR   ;
+      A     BR;
+      )     ;
+      A(    ;
+      L     "[DB_AnalogInputs]".[LevelTag].OUTV;
+      L     #Temp_Real;
+      >R    ;
+      )     ;
+      R     #Interlocks.LevelLow;
+      NOP   0;
+
+NETWORK
+TITLE =Device 1 Auto Control Logic (R0 — explicit run-permit chain)
+
+      A     #Control.AutoMode;
+      AN    #Faults.GeneralFault;
+      AN    #Interlocks.LevelHigh;
+      AN    #Interlocks.PressureHigh;
+      A(    ;
+      O     #Control.Device1_StartCmd;
+      O     #Interlocks.LevelLow;
+      )     ;
+      =     L     22.0;
+      A     L     22.0;
+      BLD   102;
+      =     "[Device1_DB]".Control.AutoFwd;
+      AN    L     22.0;
+      =     "[Device1_DB]".Control.AutoStop;
+
+NETWORK
+TITLE =Run Feedback Fault — IEC TON multi-instance, 10 s timeout (R8)
+
+      A     "[Device1_DB]".Control.AutoFwd;
+      AN    "[Device1_DB]".Status.Running;
+      =     L      8.0;
+      BLD   103;
+      CALL  #RunFeedback_Timer (
+           IN                       := L      8.0,
+           PT                       := T#10S);
+      A     #RunFeedback_Timer.Q;
+      S     #Faults.RunFeedbackFault;
+      A(    ;                                        // R5 — fault reset only when condition cleared
+      A     #SCADA.FaultReset_PB;
+      AN    "[Device1_DB]".Control.AutoFwd;          // Only reset if not demanding run
+      )     ;
+      R     #Faults.RunFeedbackFault;
+      NOP   0;
+
+NETWORK
+TITLE =General Fault Aggregation
+
+      O     #Faults.RunFeedbackFault;
+      =     #Faults.GeneralFault;
+
+NETWORK
+TITLE =Reset SCADA Pushbuttons (R4 — MANDATORY last network)
+
+      SET   ;
+      R     #SCADA.AutoMode_PB;
+      R     #SCADA.FaultReset_PB;
+      R     #SCADA.ManualStart_PB;
+      R     #SCADA.ManualStop_PB;
+
+
+END_FUNCTION_BLOCK

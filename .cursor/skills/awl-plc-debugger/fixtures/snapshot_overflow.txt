@@ -1,0 +1,16 @@
+Snapshot: PowerMeter_Totalizer — Network 4 — Energy delta accumulation
+Captured 2026-04-21 09:14:42
+
+NETWORK 4 : Calculate energy delta and add to running total
+
+      L     #PowerMeter_KwH         | RLO=1 STA=1 ACCU1=7F800000 ACCU2=00000000 AR1=00.0 AR2=00.0 DB1=105 DB2=173 STATUS=1000 0011
+      L     #Power_Previous_KwH     | RLO=1 STA=1 ACCU1=44ABE000 ACCU2=7F800000 AR1=00.0 AR2=00.0 DB1=105 DB2=173 STATUS=1000 0011
+      -R                            | RLO=1 STA=1 ACCU1=7F800000 ACCU2=44ABE000 AR1=00.0 AR2=00.0 DB1=105 DB2=173 STATUS=1010 0011
+      T     #Diff_kWh               | RLO=1 STA=1 ACCU1=7F800000 ACCU2=44ABE000 AR1=00.0 AR2=00.0 DB1=105 DB2=173 STATUS=1010 0011
+
+Yellow annotations:
+  #PowerMeter_KwH       → DI 100.DBD 8     ← VALUE: 0x7F800000 (IEEE 754: +Infinity)
+  #Power_Previous_KwH   → DI 100.DBD 12    ← VALUE: 0x44ABE000 (IEEE 754: 1375.0)
+  #Diff_kWh             → DI 100.DBD 16    (was: 0x44CCDD00; now: 0x7F800000)
+
+Operator complaint: "Energy totalizer is showing crazy values — running total jumped to infinity"

@@ -25,6 +25,10 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["awl_text_sync*"]
+
 [project.scripts]
 awl-text-sync = "awl_text_sync.main:main"
 awl-text-sync-ui = "awl_text_sync.ui:main"

@@ -1,0 +1,26 @@
+{
+  "fixture": "snapshot_mixed_db",
+  "expected_diagnosis": {
+    "db_register_trace": {
+      "before_call": {"DB1": 105, "DB2": 173, "interpretation": "Parent FB's instance DB context"},
+      "during_call": {"DB1": 105, "DB2": 200, "interpretation": "DB2 changed to the multi-instance TON's effective context (200) for the call duration"},
+      "after_call": {"DB1": 105, "DB2": 200, "interpretation": "After return from CALL, DB2 should ideally be restored to 173. The snapshot shows DB2 still at 200 because the multi-instance TON's instance is embedded in DB173 — DB2 reflects the inner sub-DB scope. This is normal for IEC multi-instance timers."}
+    },
+    "key_rlo_transition": {
+      "line": 6,
+      "instruction": "A #K208_TimerOn.Q",
+      "rlo_before": 1,
+      "rlo_after": 0,
+      "operand_value": 0,
+      "explanation": "TON's Q output is 0 because the 15-second timer has not yet elapsed. RLO drops to 0; subsequent S #Control.K208_RunTimeout does NOT execute (S only fires on RLO=1)."
+    },
+    "verdict": "Normal. The CALL boundary correctly preserves DB1; DB2 reflects the called sub-instance scope. The Q=0 indicates the timer is still running (less than 15 s since enable went TRUE), which is consistent with the trigger A K208.RUN being TRUE this scan.",
+    "patterns_observed": [
+      "Project standard pattern: enable → store to L 8.0 → BLD 103 → CALL multi-instance TON → check .Q (matches awl-project-style.md)"
+    ],
+    "next_steps": [
+      "If the engineer wants to verify timer timing, route to awlsim-runner with --virtual-time-ms-per-cycle to advance the simulator clock without sleeping.",
+      "If timer never elapses on the live PLC, investigate whether the enable condition stays TRUE for the full 15 s (use snapshot-to-simulation pipeline)."
+    ]
+  }
+}

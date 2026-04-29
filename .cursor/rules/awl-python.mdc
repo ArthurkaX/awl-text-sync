@@ -1,0 +1,11 @@
+---
+description: Python package awl_text_sync — CLI, UI, validators vs AWL edit rules
+globs: awl_text_sync/**/*.py
+alwaysApply: false
+---
+
+# awl_text_sync Python changes
+
+- Changes here affect **CLI**, **desktop UI**, **splitter / validator / builder**, and **tests**. Run `python -m pytest` after non-trivial edits.
+- Rules for editing **AWL block text** in `Project/Blocks/` are in **`docs/working_rules.md`**, not in this package’s docstrings alone.
+- Workspace flow remains: **split → edit Project → validate → build** — see **AGENTS.md**.

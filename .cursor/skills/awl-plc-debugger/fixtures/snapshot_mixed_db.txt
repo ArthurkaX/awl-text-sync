@@ -1,0 +1,22 @@
+Snapshot: T2O_CrystaliserT209A — Network 8 — CALL boundary across DB context
+Captured 2026-04-22 11:08:33
+
+NETWORK 8 : Call subordinate FB for K208 timer
+
+      A     "K208.RUN"                  | RLO=1 STA=1 ACCU1=00000001 ACCU2=00000000 AR1=00.0 AR2=00.0 DB1=105 DB2=173 STATUS=1000 0011
+      =     L     8.0                   | RLO=1 STA=1 ACCU1=00000001 ACCU2=00000000 AR1=00.0 AR2=00.0 DB1=105 DB2=173 STATUS=1000 0010
+      BLD   103                         | RLO=1 STA=1 ACCU1=00000001 ACCU2=00000000 AR1=00.0 AR2=00.0 DB1=105 DB2=173 STATUS=1000 0010
+      CALL  #K208_TimerOn (
+            IN := L 8.0,
+            PT := T#15S)                | RLO=1 STA=1 ACCU1=00000000 ACCU2=00000000 AR1=00.0 AR2=00.0 DB1=105 DB2=200 STATUS=1000 0011
+      A     #K208_TimerOn.Q             | RLO=0 STA=0 ACCU1=00000000 ACCU2=00000000 AR1=00.0 AR2=00.0 DB1=105 DB2=200 STATUS=1000 0001
+      S     #Control.K208_RunTimeout    | RLO=0 STA=0 ACCU1=00000000 ACCU2=00000000 AR1=00.0 AR2=00.0 DB1=105 DB2=200 STATUS=1000 0000
+
+Yellow annotations:
+  "K208.RUN"                → DI 173.DBX 24.0   ← VALUE: 1 (TRUE)
+  L 8.0                     → local byte 8, bit 0 (used as IN parameter staging)
+  #K208_TimerOn             → multi-instance timer at DI 173 offset (instance "TON")
+  #K208_TimerOn.Q           → DI 173.DBX (offset).6   ← VALUE: 0 (timer not yet elapsed)
+  #Control.K208_RunTimeout  → DI 173.DBX 32.4
+
+Engineer note: "Verifying that the multi-instance TON CALL preserves the parent FB's DB context across the call boundary"

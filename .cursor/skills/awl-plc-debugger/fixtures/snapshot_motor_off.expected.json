@@ -1,0 +1,28 @@
+{
+  "fixture": "snapshot_motor_off",
+  "expected_diagnosis": {
+    "final_output_state": {
+      "operand": "K248.RunOutput (Q 5.2)",
+      "rlo": 0,
+      "value": 0,
+      "physical_state": "motor coil de-energized — motor stopped"
+    },
+    "key_rlo_transitions": [
+      {
+        "line": 3,
+        "instruction": "AN #Faults.K248_FAULT",
+        "rlo_before": 1,
+        "rlo_after": 0,
+        "operand_resolved": "DB173.DBX 12.4",
+        "operand_value": 1,
+        "explanation": "AN forces RLO = previous_RLO AND NOT operand. Since #Faults.K248_FAULT is TRUE (1), AN drives RLO to 0. This is the killing instruction."
+      }
+    ],
+    "verdict": "Output is correctly OFF from CPU's perspective — fault flag is active. The question is WHY the fault is active.",
+    "next_steps": [
+      "Route to awl-step7 Analysis Mode: find which network sets #Faults.K248_FAULT (likely a fault aggregation network).",
+      "Once the setting condition is identified, route to awl-step7 Cat 12 Pattern Consistency: compare K248's fault setting against K201/K202/K209 — possible AN/A or A/O inversion bug (the CONTEXT-3 finding).",
+      "Optionally route to awlsim-runner Mode 2 (follow to root) to reproduce."
+    ]
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "schema_version": "1.0",
+  "tool": "awlsim_tracer",
+  "fb": "T2O_CompressorControl",
+  "network": 12,
+  "trace": [
+    {
+      "step": 1,
+      "instruction": "A #Control.K248_AutoRun",
+      "rlo": 1,
+      "sta": 1,
+      "accu1": 1,
+      "accu2": 0,
+      "ar1": "P#0.0",
+      "ar2": "P#0.0",
+      "db1": 105,
+      "db2": 173,
+      "status_word": "10000011"
+    },
+    {
+      "step": 2,
+      "instruction": "A #Permissives.AllReady",
+      "rlo": 1,
+      "sta": 1,
+      "accu1": 1,
+      "accu2": 0,
+      "ar1": "P#0.0",
+      "ar2": "P#0.0",
+      "db1": 105,
+      "db2": 173,
+      "status_word": "10000011"
+    },
+    {
+      "step": 3,
+      "instruction": "AN #Faults.K248_FAULT",
+      "rlo": 0,
+      "sta": 0,
+      "accu1": 1,
+      "accu2": 0,
+      "ar1": "P#0.0",
+      "ar2": "P#0.0",
+      "db1": 105,
+      "db2": 173,
+      "status_word": "10000001",
+      "rlo_transition": "1->0",
+      "transition_reason": "AN with operand TRUE forces RLO=0"
+    },
+    {
+      "step": 4,
+      "instruction": "= K248.RunOutput",
+      "rlo": 0,
+      "sta": 0,
+      "accu1": 1,
+      "accu2": 0,
+      "ar1": "P#0.0",
+      "ar2": "P#0.0",
+      "db1": 105,
+      "db2": 173,
+      "status_word": "10000000",
+      "side_effect": "Q 5.2 := 0"
+    }
+  ],
+  "summary": {
+    "final_rlo": 0,
+    "final_output_K248_RunOutput": 0,
+    "killing_instruction_step": 3
+  }
+}

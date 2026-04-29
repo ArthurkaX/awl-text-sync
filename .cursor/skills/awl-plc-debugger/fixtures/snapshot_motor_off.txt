@@ -1,0 +1,19 @@
+Snapshot: T2O_CompressorControl — Network 12 — K248 Run Logic
+Captured 2026-04-15 14:23:11
+
+NETWORK 12 : K248 Run Output — Auto Mode
+
+      A     #Control.K248_AutoRun       | RLO=1 STA=1 ACCU1=00000001 ACCU2=00000000 AR1=00.0 AR2=00.0 DB1=105 DB2=173 STATUS=1000 0011
+      A     #Permissives.AllReady       | RLO=1 STA=1 ACCU1=00000001 ACCU2=00000000 AR1=00.0 AR2=00.0 DB1=105 DB2=173 STATUS=1000 0011
+      AN    #Faults.K248_FAULT          | RLO=0 STA=0 ACCU1=00000001 ACCU2=00000000 AR1=00.0 AR2=00.0 DB1=105 DB2=173 STATUS=1000 0001
+      AN    #Interlocks.SafetyTrip      | RLO=0 STA=1 ACCU1=00000001 ACCU2=00000000 AR1=00.0 AR2=00.0 DB1=105 DB2=173 STATUS=1000 0001
+      =     "K248.RunOutput"            | RLO=0 STA=0 ACCU1=00000001 ACCU2=00000000 AR1=00.0 AR2=00.0 DB1=105 DB2=173 STATUS=1000 0000
+
+Yellow annotations (resolved addresses):
+  #Control.K248_AutoRun   → DB173.DBX 4.2
+  #Permissives.AllReady   → DB173.DBX 6.0
+  #Faults.K248_FAULT      → DB173.DBX 12.4   ← VALUE: 1 (TRUE — fault active)
+  #Interlocks.SafetyTrip  → DB173.DBX 14.0   ← VALUE: 0
+  "K248.RunOutput"        → Q 5.2
+
+Operator complaint: "K248 should be running but the output is OFF"

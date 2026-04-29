@@ -1,0 +1,87 @@
+      FUNCTION "[Action]_[Subject]" : VOID
+TITLE =[DESCRIBE WHAT THIS FUNCTION CALCULATES OR DOES]
+//
+// Stateless function — no data persists between calls.
+// All state must be passed via parameters.
+//
+AUTHOR : [Name]
+VERSION : 0.1
+
+
+VAR_INPUT
+  InputValue1 : REAL ;	        //[Description of input 1]
+  InputValue2 : REAL ;	        //[Description of input 2]
+  Enable : BOOL ;	            //Enable processing
+END_VAR
+VAR_OUTPUT
+  OutputValue : REAL ;	        //[Description of output]
+  StatusOK : BOOL ;	            //TRUE if calculation valid
+  Error : BOOL ;	            //TRUE if calculation failed
+END_VAR
+VAR_TEMP
+  Temp_Real : REAL ;	
+  Temp_Result : REAL ;	
+END_VAR
+BEGIN
+NETWORK
+TITLE =Check Enable — skip if not enabled
+
+      AN    #Enable;
+      JC    Skip;
+NETWORK
+TITLE =Validate inputs
+
+      A(    ;
+      L     #InputValue2;
+      L     0.000000e+000;
+      <=R   ;                    // Divisor must be > 0
+      )     ;
+      JC    Err;
+NETWORK
+TITLE =Perform calculation
+
+      A(    ;
+      L     #InputValue1;
+      L     #InputValue2;
+      /R    ;
+      T     #Temp_Result;
+      AN    OV;
+      SAVE  ;
+      CLR   ;
+      A     BR;
+      )     ;
+      JNB   Err;
+      L     #Temp_Result;
+      T     #OutputValue;
+      SET   ;
+      =     #StatusOK;
+      CLR   ;
+      =     #Error;
+      JU    Exit;
+NETWORK
+TITLE =Error — set outputs to safe state
+
+Err:  NOP   0;
+      L     0.000000e+000;
+      T     #OutputValue;
+      CLR   ;
+      =     #StatusOK;
+      SET   ;
+      =     #Error;
+      JU    Exit;
+NETWORK
+TITLE =Skip — enable is FALSE
+
+Skip: NOP   0;
+      L     0.000000e+000;
+      T     #OutputValue;
+      CLR   ;
+      =     #StatusOK;
+      CLR   ;
+      =     #Error;
+NETWORK
+TITLE =Exit
+
+Exit: BE    ;
+
+END_FUNCTION
