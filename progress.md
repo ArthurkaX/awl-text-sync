@@ -4,12 +4,20 @@
 
 ## Current focus
 
-- **Active goal:** (none set — edit when a plan is in flight)
-- **Plan / ticket:** (link or id)
-- **In flight:** (branch, feature, or task — avoid duplicate agent work)
-- **Blockers:** (none)
+- **Active goal:** Continue with a **real AWL / STEP 7 Classic** example (not synthetic fixtures); pair with engineer-owned TIA export if testing `plccheck` semantics (D1–D6).
+- **Plan / ticket:** Siemens LSP / plccheck experiment — D0 done in repo; semantic matrix pending.
+- **In flight:** Branch `feature/siemens-plccheck-experiment` (optional merge to `main`).
+- **Blockers:** None for native `awl-text-sync`; full AWL-vs-`plccheck` comparison needs real paired exports + SIMATIC compile.
 
 ## Session log
+
+### 2026-04-29 — Siemens plccheck demo + testing report (handoff)
+
+- **Outcome:** D0_smoke validated on synthetic fixtures; integration tests optional; `plccheck_extra` fixed for Windows `npx.cmd`. **No dedicated open-source “AWL/STL LSP”** — Dynamic Siemens is **SCL/ST/TIA + `.plc.json`**, with `.awl` sharing VS Code language id `siemens` (semantic parity with Classic STL unproven).
+- **Done:** `tests/fixtures/classic_demo_workspace`, `tests/fixtures/plccheck_demo_minimal`, `scripts/run_siemens_demo_D0.ps1`, `docs/siemens_plccheck_experiment.md` (D0–D6 matrix + verdict template), `RUN_PLCCHECK_INTEGRATION` pytest, `awl_text_sync/plccheck_extra.py` + `--plccheck-root` CLI.
+- **Next:** Fresh chat: paste or attach real `.awl` / workspace; use `awl-text-sync validate` + STEP 7 compile as gates; add **truST `trust-lsp` only for IEC ST**, not AWL — see user handoff block in last assistant message.
+- **Notes:** Default `pytest`: 55 passed, 2 skipped (integration). With `RUN_PLCCHECK_INTEGRATION=1`: integration tests pass when Node/npm on PATH.
+
 
 ### Template for new entries
 
