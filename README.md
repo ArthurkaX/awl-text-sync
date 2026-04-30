@@ -147,7 +147,7 @@ workspace/
 - Make the smallest safe change that solves the task.
 
 Short working rules: [`docs/working_rules.md`](./docs/working_rules.md)  
-Detailed STL validation rules: [`docs/validate_stl_rules.md`](./docs/validate_stl_rules.md)
+Detailed STL validation rules: [`docs/validate_stl_rules_german_mnemonics.md`](./docs/validate_stl_rules_german_mnemonics.md)
 
 ## STEP 7 Import Notes
 

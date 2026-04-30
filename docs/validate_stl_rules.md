@@ -39,6 +39,10 @@ The main STL rules come from:
   operation overview;
 - Berger STL/SCL, especially addressing variables, indirect addressing,
   pointers, block calls, and jump labels.
+- the German-mnemonic AWL reference in
+  [`docs/validate_stl_rules_german_mnemonics.md`](./validate_stl_rules_german_mnemonics.md)
+  for exact EN <-> DE mnemonic pairs, peripheral I/O names, and the core data
+  type and declaration vocabulary.
 
 ## 4. Required Checks
 
@@ -222,3 +226,10 @@ Do not add yet:
 - catches label/jump errors;
 - avoids duplicated logic;
 - reports clear file and line information.
+
+## 9. Related Reference
+
+Use [`docs/validate_stl_rules_german_mnemonics.md`](./validate_stl_rules_german_mnemonics.md)
+for the English reference to German SIMATIC mnemonics, peripheral I/O
+aliases, and the related language elements for `STRUCT`, `ARRAY`, `UDT`,
+`VAR`, `DB`, and constants.
