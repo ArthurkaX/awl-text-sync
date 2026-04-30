@@ -99,6 +99,7 @@ awl-text-sync validate --workspace . --call-graph
 awl-text-sync validate --workspace . --call-graph --open-call-graph
 awl-text-sync build-split --workspace .
 awl-text-sync build-monolith --workspace .
+awl-text-sync init-agent-docs --workspace .
 awl-text-sync ui
 ```
 
@@ -138,6 +139,22 @@ workspace/
 - `validate` checks whether project files can round-trip safely back to STEP 7-compatible output.
 - Treat `Build/*` as generated output. Do not edit or re-save those files unless you intentionally want to change the generated result.
 
+## Agent Bootstrap Docs
+
+Create agent-facing workspace instructions when a workspace should be edited by Codex, Cursor, Claude Code, or another AI assistant:
+
+```powershell
+awl-text-sync init-agent-docs --workspace .
+```
+
+This writes:
+
+- `AGENTS.md`
+- `docs/working_rules.md`
+- `docs/awl_reference.md`
+
+Existing files are skipped by default. Use `--force` only when you intentionally want to overwrite the generated agent docs.
+
 ## Editing Rules
 
 - One block per `.awl` file.
@@ -147,7 +164,7 @@ workspace/
 - Make the smallest safe change that solves the task.
 
 Short working rules: [`docs/working_rules.md`](./docs/working_rules.md)  
-Detailed STL validation rules: [`docs/validate_stl_rules_german_mnemonics.md`](./docs/validate_stl_rules_german_mnemonics.md)
+Detailed STL validation rules: [`docs/validate_stl_rules.md`](./docs/validate_stl_rules.md)
 
 ## STEP 7 Import Notes
 

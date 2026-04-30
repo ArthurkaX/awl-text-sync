@@ -31,6 +31,12 @@ awl-text-sync-ui = "awl_text_sync.ui:main"
 s7p-sync = "awl_text_sync.main:main"
 s7p-sync-ui = "awl_text_sync.ui:main"
 
+[tool.setuptools.package-data]
+awl_text_sync = [
+    "templates/agent_docs/AGENTS.md",
+    "templates/agent_docs/docs/*.md",
+]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-p no:cacheprovider"

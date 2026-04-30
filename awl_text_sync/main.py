@@ -7,6 +7,7 @@ from pathlib import Path
 
 try:
     from . import APP_NAME
+    from .agent_docs import write_agent_docs
     from .call_graph import build_call_graph, default_call_graph_report_path, write_call_graph_report
     from .builder import build_monolith, build_split_import
     from .config import resolve_workspace
@@ -16,6 +17,7 @@ try:
     from .parser import ParseError
 except ImportError:  # pragma: no cover - script/PyInstaller fallback
     from awl_text_sync import APP_NAME
+    from awl_text_sync.agent_docs import write_agent_docs
     from awl_text_sync.call_graph import build_call_graph, default_call_graph_report_path, write_call_graph_report
     from awl_text_sync.builder import build_monolith, build_split_import
     from awl_text_sync.config import resolve_workspace
@@ -33,10 +35,25 @@ def build_parser() -> argparse.ArgumentParser:
         default=Path("."),
         help="Workspace root containing Exported/, Project/, and Build/",
     )
+    workspace_parent = argparse.ArgumentParser(add_help=False)
+    workspace_parent.add_argument(
+        "--workspace",
+        type=Path,
+        default=argparse.SUPPRESS,
+        help="Workspace root containing Exported/, Project/, and Build/",
+    )
 
     subparsers = parser.add_subparsers(dest="command", required=True)
-    subparsers.add_parser("split", help="Split the single Exported/*.AWL file into Project/Blocks/ using names like fb68.awl")
-    validate_parser = subparsers.add_parser("validate", help="Validate Project/Blocks/ and Project/Symbols/")
+    subparsers.add_parser(
+        "split",
+        parents=[workspace_parent],
+        help="Split the single Exported/*.AWL file into Project/Blocks/ using names like fb68.awl",
+    )
+    validate_parser = subparsers.add_parser(
+        "validate",
+        parents=[workspace_parent],
+        help="Validate Project/Blocks/ and Project/Symbols/",
+    )
     validate_parser.add_argument(
         "--call-graph",
         action="store_true",
@@ -47,9 +64,19 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Open the call graph report in the default browser after writing it",
     )
-    subparsers.add_parser("build-split", help="Build split import output under Build/SplitImport/")
-    subparsers.add_parser("build-monolith", help="Build ALL_BLOCKS.AWL under Build/Monolith/")
-    subparsers.add_parser("ui", help="Launch the desktop UI")
+    subparsers.add_parser("build-split", parents=[workspace_parent], help="Build split import output under Build/SplitImport/")
+    subparsers.add_parser("build-monolith", parents=[workspace_parent], help="Build ALL_BLOCKS.AWL under Build/Monolith/")
+    agent_docs_parser = subparsers.add_parser(
+        "init-agent-docs",
+        parents=[workspace_parent],
+        help="Create agent bootstrap docs in the workspace",
+    )
+    agent_docs_parser.add_argument(
+        "--force",
+        action="store_true",
+        help="Overwrite existing agent bootstrap docs",
+    )
+    subparsers.add_parser("ui", parents=[workspace_parent], help="Launch the desktop UI")
     return parser
 
 
@@ -91,6 +118,16 @@ def main() -> int:
     if args.command == "build-monolith":
         count = build_monolith(paths)
         print(f"Built monolith with {count} blocks at {paths.build_all_blocks}")
+        return 0
+
+    if args.command == "init-agent-docs":
+        result = write_agent_docs(paths, force=getattr(args, "force", False))
+        for path in result.created:
+            print(f"Created {path}")
+        for path in result.overwritten:
+            print(f"Overwrote {path}")
+        for path in result.skipped:
+            print(f"Skipped existing {path}")
         return 0
 
     if args.command == "ui":

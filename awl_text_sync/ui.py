@@ -11,6 +11,7 @@ from typing import Callable
 
 try:
     from . import APP_NAME
+    from .agent_docs import write_agent_docs
     from .call_graph import build_call_graph, default_call_graph_report_path, write_call_graph_report
     from .builder import build_monolith, build_split_import
     from .config import (
@@ -26,6 +27,7 @@ try:
     from .writer import ensure_workspace_gitignore
 except ImportError:  # pragma: no cover - script/PyInstaller fallback
     from awl_text_sync import APP_NAME
+    from awl_text_sync.agent_docs import write_agent_docs
     from awl_text_sync.call_graph import build_call_graph, default_call_graph_report_path, write_call_graph_report
     from awl_text_sync.builder import build_monolith, build_split_import
     from awl_text_sync.config import (
@@ -79,6 +81,16 @@ def _run_call_graph(paths: WorkspacePaths) -> str:
     except Exception:
         pass
     return f"Wrote call graph report to {report_path}"
+
+
+def _run_agent_docs(paths: WorkspacePaths) -> str:
+    result = write_agent_docs(paths)
+    return (
+        "Agent docs: "
+        f"created {len(result.created)}, "
+        f"skipped {len(result.skipped)}, "
+        f"overwritten {len(result.overwritten)}"
+    )
 
 
 def _safe_import_tk():
@@ -360,6 +372,19 @@ class SyncUiApp:
             self.buttons.append(button)
             self.action_buttons[label] = button
 
+        tools_frame = tk.LabelFrame(root_frame, text="Workspace Tools", padx=10, pady=10)
+        tools_frame.pack(fill="x", pady=(12, 0))
+
+        agent_docs_button = tk.Button(
+            tools_frame,
+            text="Create Agent Docs",
+            width=18,
+            command=lambda: self._start_action("Create Agent Docs", _run_agent_docs),
+        )
+        agent_docs_button.pack(side="left")
+        self.buttons.append(agent_docs_button)
+        self.action_buttons["Create Agent Docs"] = agent_docs_button
+
         status_frame = tk.Frame(root_frame)
         status_frame.pack(fill="x", pady=(12, 0))
         tk.Label(status_frame, text="Status:").pack(side="left")
@@ -484,6 +509,7 @@ class SyncUiApp:
                 "Call Graph": build_ready,
                 "Build Split": build_ready,
                 "Build Monolith": build_ready,
+                "Create Agent Docs": paths.root.exists(),
             }
         except Exception as exc:
             self.workspace_state_var.set(f"Workspace problem: {exc}")

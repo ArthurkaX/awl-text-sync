@@ -34,12 +34,36 @@ This repository is a STEP 7 AWL text workspace. Keep it editable outside STEP 7,
   - block content
   - filename
   - symbol entry in `Project/Symbols/*.sdf`
+- One block equals one file.
+- The block type and block number must not change.
+- The filename must match the block header, for example `fb68_FB_Std_Deviation.awl`.
 - Do not mix symbolic and absolute DB access in one reference.
 - Keep pointer literals absolute.
 - End each STL statement with `;`, including simple instructions and `CALL` statements.
 - Boolean opcodes such as `A`, `AN`, `O`, `ON`, `X`, `XN`, `S`, `R`, `=`, `FP`, and `FN` should use bit-compatible operands.
 - Jump labels must exist in the same block and must not be duplicated.
 - `CALL` targets, instance DBs, and parameter names must match the workspace block interface.
+- `FB` calls require an instance DB.
+- Local instances must use `#` where the block interface expects them.
+- Parameters must come from the real target interface, not guessed names.
+
+## Core Editing Rules
+
+These are the formal constraints that keep the workspace stable:
+
+- one block equals one file;
+- block type and number are immutable;
+- filename, block header, and `Project/Symbols/*.sdf` entry must stay in sync;
+- symbolic and absolute DB access must not be mixed in the same reference;
+- pointer handling must stay absolute and syntactically valid;
+- jump labels must be defined in the same block and must be unique;
+- `FB` calls require an instance DB;
+- local instances use `#` syntax where applicable;
+- `CALL` parameters must match the real interface exactly;
+- keep formatting intact unless the task explicitly requires a wider rewrite.
+
+**Goal**: Neither a human nor an AI should break the project with a random
+rename or a syntax error.
 
 ## Before You Finish
 
