@@ -13,7 +13,7 @@ try:
 
     __version__ = _pkg_version(PACKAGE_NAME)
 except Exception:
-    __version__ = "0.1.0"
+    __version__ = "1.1.0"
 
 __all__ = [
     "APP_NAME",

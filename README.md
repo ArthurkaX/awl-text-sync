@@ -1,8 +1,17 @@
 # awl-text-sync
 
-STEP 7 AWL workspace tool for splitting, validating, and rebuilding exported projects in a git-friendly structure.
+Turn exported STEP 7 AWL projects into a clean, git-friendly workspace you can actually work with.
 
-`awl-text-sync` is designed for local Windows maintenance workflows where engineers need to inspect existing STEP 7 code, make targeted edits, validate the result, and rebuild import-ready output without working inside one large exported `.AWL` file.
+`awl-text-sync` splits monolithic STEP 7 exports into editable per-block files, validates changes before import, and rebuilds STEP 7-ready output from the same workspace. If you maintain legacy PLC code, review changes in git, or need a safer way to edit and analyze exported projects on Windows, this tool removes a lot of friction.
+
+## What You Get
+
+- Faster review and search across individual blocks instead of one giant `.AWL` file.
+- A repeatable `split -> edit -> validate -> build` workflow.
+- Git-friendly files for diffing, code review, and history.
+- Safer round trips back into STEP 7.
+- Optional desktop UI for local maintenance work near the equipment.
+- Workspace files that are easier to feed into automation or analysis tools.
 
 ## Important
 
@@ -20,9 +29,21 @@ STEP 7 AWL workspace tool for splitting, validating, and rebuilding exported pro
 - Validate changes before import back into STEP 7.
 - Make review, search, and history easier when the project is stored in git.
 
+## Why People Adopt It
+
+Most STEP 7 export workflows are optimized for import, not for real work:
+
+- Large exports are hard to diff, hard to review, and unpleasant to navigate.
+- Small edits are risky when they happen inside a monolithic file.
+- Encoding mistakes and manual re-save steps cause avoidable import failures.
+
+`awl-text-sync` gives you a structured workspace so the project becomes easier to understand, safer to change, and more practical to keep under version control.
+
 ## Installation
 
 For normal Windows use, download the latest `awl-text-sync.exe` from GitHub Releases.
+
+If you want the fastest path to a working setup, install the release binary and point it at an exported STEP 7 workspace.
 
 For local development from this repository:
 
@@ -64,6 +85,8 @@ awl-text-sync build-monolith --workspace .
 
 6. Import the rebuilt output back into STEP 7 and compile there.
 
+If you already know STEP 7 exports, this is the shortest path from “hard-to-read dump” to “editable project workspace”.
+
 ## Round Trip Workflow
 
 The intended cycle is:
@@ -89,6 +112,18 @@ Available actions in the UI:
 - `Build Monolith`
 
 The UI is intended for quick local operation near the equipment, without requiring routine CLI use.
+
+## Best Fit
+
+This tool is a good fit if you:
+
+- work with STEP 7 exports on Windows;
+- want smaller files and cleaner diffs in git;
+- need to validate round trips before import;
+- maintain legacy PLC projects where readability matters;
+- want to inspect or analyze code without constantly opening STEP 7.
+
+It is not a replacement for STEP 7. It is the layer that makes STEP 7 exports much easier to work with.
 
 ## Commands
 

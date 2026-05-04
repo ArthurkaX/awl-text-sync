@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "awl-text-sync"
-version = "0.1.0"
+version = "1.1.0"
 description = "STEP 7 AWL workspace splitter and builder"
 readme = "README.md"
 requires-python = ">=3.11"
