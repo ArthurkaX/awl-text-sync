@@ -43,6 +43,14 @@ Most STEP 7 export workflows are optimized for import, not for real work:
 
 For normal Windows use, download the latest `awl-text-sync.exe` from GitHub Releases.
 
+Current release: `v1.1.0`
+
+SHA256:
+
+```text
+531021C93D798F888E19148F617E4729842EECEB63C2C3C84BE7292FB96243A1
+```
+
 If you want the fastest path to a working setup, install the release binary and point it at an exported STEP 7 workspace.
 
 For local development from this repository:
