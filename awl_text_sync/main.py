@@ -28,55 +28,126 @@ except ImportError:  # pragma: no cover - script/PyInstaller fallback
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog=APP_NAME)
+    try:
+        from . import __version__
+    except ImportError:  # pragma: no cover - script/PyInstaller fallback
+        from awl_text_sync import __version__
+
+    parser = argparse.ArgumentParser(
+        prog=APP_NAME,
+        description=(
+            "STEP 7 AWL workspace text sync tool.\n"
+            "Split, validate, and build AWL block files for STEP 7 import/export.\n"
+            "Run without arguments to launch the desktop GUI."
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=f"%(prog)s {__version__}",
+    )
     parser.add_argument(
         "--workspace",
         type=Path,
         default=Path("."),
-        help="Workspace root containing Exported/, Project/, and Build/",
+        help="Workspace root containing Exported/, Project/, and Build/ (default: .)",
     )
+
     workspace_parent = argparse.ArgumentParser(add_help=False)
     workspace_parent.add_argument(
         "--workspace",
         type=Path,
         default=argparse.SUPPRESS,
-        help="Workspace root containing Exported/, Project/, and Build/",
+        help="Workspace root containing Exported/, Project/, and Build/ (default: .)",
     )
 
-    subparsers = parser.add_subparsers(dest="command", required=True)
+    subparsers = parser.add_subparsers(
+        dest="command",
+        required=True,
+        title="commands",
+    )
+
     subparsers.add_parser(
         "split",
         parents=[workspace_parent],
-        help="Split the single Exported/*.AWL file into Project/Blocks/ using names like fb68.awl",
+        help="Split Exported/*.AWL into Project/Blocks/",
+        description=(
+            "Read the single exported .AWL file from Exported/ and split it into\n"
+            "individual block files under Project/Blocks/.\n"
+            "Each block gets a file named like fb68.awl.\n"
+            "Also copies the .sdf symbols file to Project/Symbols/."
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
+
     validate_parser = subparsers.add_parser(
         "validate",
         parents=[workspace_parent],
         help="Validate Project/Blocks/ and Project/Symbols/",
+        description=(
+            "Parse all .awl block files in Project/Blocks/ and the .sdf symbols file\n"
+            "in Project/Symbols/. Reports syntax errors and consistency issues."
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     validate_parser.add_argument(
         "--call-graph",
         action="store_true",
-        help="Write an interactive call graph report under Build/Reports/call_graph.html",
+        help="Write an interactive call graph HTML report under Build/Reports/",
     )
     validate_parser.add_argument(
         "--open-call-graph",
         action="store_true",
-        help="Open the call graph report in the default browser after writing it",
+        help="Open the call graph report in the default browser",
     )
-    subparsers.add_parser("build-split", parents=[workspace_parent], help="Build split import output under Build/SplitImport/")
-    subparsers.add_parser("build-monolith", parents=[workspace_parent], help="Build ALL_BLOCKS.AWL under Build/Monolith/")
+
+    subparsers.add_parser(
+        "build-split",
+        parents=[workspace_parent],
+        help="Build split import output under Build/SplitImport/",
+        description=(
+            "Build a set of individual .awl files and a .sdf file under\n"
+            "Build/SplitImport/, ready for import into STEP 7."
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+
+    subparsers.add_parser(
+        "build-monolith",
+        parents=[workspace_parent],
+        help="Build ALL_BLOCKS.AWL under Build/Monolith/",
+        description=(
+            "Combine all Project/Blocks/*.awl files into a single\n"
+            "ALL_BLOCKS.AWL file under Build/Monolith/."
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+
     agent_docs_parser = subparsers.add_parser(
         "init-agent-docs",
         parents=[workspace_parent],
-        help="Create agent bootstrap docs in the workspace",
+        help="Create agent/AI bootstrap docs in the workspace",
+        description=(
+            "Create AGENTS.md and documentation files in the workspace root.\n"
+            "These files help AI coding agents understand the project structure."
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     agent_docs_parser.add_argument(
         "--force",
         action="store_true",
-        help="Overwrite existing agent bootstrap docs",
+        help="Overwrite existing agent docs instead of skipping them",
     )
-    subparsers.add_parser("ui", parents=[workspace_parent], help="Launch the desktop UI")
+
+    subparsers.add_parser(
+        "ui",
+        parents=[workspace_parent],
+        help="Launch the desktop GUI",
+        description="Launch the awl-text-sync desktop GUI.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+
     return parser
 
 

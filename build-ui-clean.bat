@@ -16,7 +16,7 @@ if errorlevel 1 (
     exit /b 1
 )
 
-python -m PyInstaller --noconfirm --clean --onefile --windowed --name "%APP_NAME%" "%ENTRY%"
+python -m PyInstaller --noconfirm --clean --onefile --console --name "%APP_NAME%" "%ENTRY%"
 if errorlevel 1 (
     echo [error] UI build failed.
     exit /b 1

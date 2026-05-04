@@ -8,8 +8,16 @@ APP_NAME = "awl-text-sync"
 LEGACY_APP_NAME = "s7p-sync"
 PACKAGE_NAME = "awl_text_sync"
 
+try:
+    from importlib.metadata import version as _pkg_version
+
+    __version__ = _pkg_version(PACKAGE_NAME)
+except Exception:
+    __version__ = "0.1.0"
+
 __all__ = [
     "APP_NAME",
+    "__version__",
     "build_monolith",
     "build_split_import",
     "LEGACY_APP_NAME",

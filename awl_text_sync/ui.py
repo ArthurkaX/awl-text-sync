@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import os
 import queue
+import sys
 import webbrowser
 import threading
 import traceback
@@ -778,9 +779,34 @@ class HelpDialog:
             self._render_step()
 
 
+def _hide_console() -> None:
+    """Hide the console window when launching GUI from a console-mode exe."""
+    if sys.platform != "win32":
+        return
+    try:
+        import ctypes
+        hwnd = ctypes.windll.kernel32.GetConsoleWindow()
+        if hwnd:
+            ctypes.windll.user32.ShowWindow(hwnd, 0)  # SW_HIDE
+    except Exception:
+        pass
+
+
 def main() -> int:
-    launch_ui()
-    return 0
+    cli_args = sys.argv[1:]
+
+    # No arguments → launch GUI directly
+    if not cli_args:
+        _hide_console()
+        launch_ui()
+        return 0
+
+    # Any arguments → CLI mode (help, split, validate, build-*, ui, etc.)
+    try:
+        from .main import main as cli_main
+    except ImportError:  # pragma: no cover - script/PyInstaller fallback
+        from awl_text_sync.main import main as cli_main
+    return cli_main()
 
 
 if __name__ == "__main__":
