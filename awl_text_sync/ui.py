@@ -54,6 +54,10 @@ def _run_split(paths: WorkspacePaths) -> str:
     return f"Split {count} blocks into {paths.project_blocks_dir}"
 
 
+def _is_repeat_split(paths: WorkspacePaths) -> bool:
+    return paths.project_blocks_dir.exists() and any(paths.project_blocks_dir.glob("*.awl"))
+
+
 def _run_validate(paths: WorkspacePaths) -> str:
     parsed = validate_workspace(paths)
     return f"Validated {len(parsed)} blocks in {paths.project_blocks_dir}"
@@ -580,6 +584,21 @@ class SyncUiApp:
         except Exception as exc:  # pragma: no cover - UI path
             self.messagebox.showerror("Invalid workspace", str(exc))
             return
+
+        if label == "Split" and _is_repeat_split(paths):
+            confirmed = self.messagebox.askyesno(
+                "Repeat Split?",
+                (
+                    "Project/Blocks already contains AWL files.\n\n"
+                    "Running Split again will recreate blocks from Exported/ and may overwrite "
+                    "changes made in Project/Blocks.\n\n"
+                    "Continue?"
+                ),
+            )
+            if not confirmed:
+                self.status_var.set("Split cancelled")
+                self._append_log(f"[cancel] Split on {paths.root}\n")
+                return
 
         self._remember_workspace(paths.root)
         self._set_busy(True)
