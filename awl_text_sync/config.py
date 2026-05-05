@@ -14,10 +14,12 @@ class WorkspacePaths:
     build_dir: Path
     build_monolith_dir: Path
     build_split_dir: Path
+    build_patch_dir: Path
     exported_all_blocks: Path
     exported_all_blocks_symbols: Path
     exported_symbols: Path
     build_all_blocks: Path
+    build_patch_blocks: Path
     build_split_blocks_dir: Path
     build_split_symbols_dir: Path
 
@@ -61,6 +63,7 @@ def resolve_workspace(root: str | Path | None = None) -> WorkspacePaths:
     build_dir = workspace_root / "Build"
     build_monolith_dir = build_dir / "Monolith"
     build_split_dir = build_dir / "SplitImport"
+    build_patch_dir = build_dir / "Patch"
 
     return WorkspacePaths(
         root=workspace_root,
@@ -71,10 +74,12 @@ def resolve_workspace(root: str | Path | None = None) -> WorkspacePaths:
         build_dir=build_dir,
         build_monolith_dir=build_monolith_dir,
         build_split_dir=build_split_dir,
+        build_patch_dir=build_patch_dir,
         exported_all_blocks=exported_dir / "ALL_BLOCKS.AWL",
         exported_all_blocks_symbols=exported_dir / "ALL_BLOCKS_SYMBOLS.AWL",
         exported_symbols=exported_dir / "Symbols.sdf",
         build_all_blocks=build_monolith_dir / "ALL_BLOCKS.AWL",
+        build_patch_blocks=build_patch_dir / "PATCH_BLOCKS.AWL",
         build_split_blocks_dir=build_split_dir / "Blocks",
         build_split_symbols_dir=build_split_dir / "Symbols",
     )

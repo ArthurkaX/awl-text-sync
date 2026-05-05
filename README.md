@@ -89,6 +89,7 @@ awl-text-sync validate --workspace .
 ```powershell
 awl-text-sync build-split --workspace .
 awl-text-sync build-monolith --workspace .
+awl-text-sync build-patch --workspace .
 ```
 
 6. Import the rebuilt output back into STEP 7 and compile there.
@@ -142,6 +143,7 @@ awl-text-sync validate --workspace . --call-graph
 awl-text-sync validate --workspace . --call-graph --open-call-graph
 awl-text-sync build-split --workspace .
 awl-text-sync build-monolith --workspace .
+awl-text-sync build-patch --workspace .
 awl-text-sync init-agent-docs --workspace .
 awl-text-sync ui
 ```
@@ -163,6 +165,7 @@ workspace/
     Symbols/
   Build/
     Monolith/
+    Patch/
     SplitImport/
     Reports/
 ```
@@ -171,6 +174,7 @@ workspace/
 - `Project/Blocks/` contains editable AWL block files in `UTF-8`.
 - `Project/Symbols/` contains the copied `.sdf` used during validate and build, also normalized to `UTF-8`.
 - `Build/Monolith/` contains generated monolithic STEP 7 import output in `cp1252`.
+- `Build/Patch/` contains one generated `PATCH_BLOCKS.AWL` file with changed or new blocks only, in `cp1252`.
 - `Build/SplitImport/` contains generated split import output in `cp1252`.
 - `Build/Reports/` contains optional reports such as call graph HTML output.
 
@@ -178,7 +182,7 @@ workspace/
 
 - `split` auto-detects the source encoding of exported `.AWL` and `.sdf` files.
 - Editable project files are normalized to `UTF-8`.
-- `build-monolith` and `build-split` always write STEP 7 import output in `cp1252`.
+- `build-monolith`, `build-split`, and `build-patch` always write STEP 7 import output in `cp1252`.
 - `validate` checks whether project files can round-trip safely back to STEP 7-compatible output.
 - Treat `Build/*` as generated output. Do not edit or re-save those files unless you intentionally want to change the generated result.
 
@@ -211,7 +215,7 @@ Detailed STL validation rules: [`docs/validate_stl_rules.md`](./docs/validate_st
 
 ## STEP 7 Import Notes
 
-1. Import the rebuilt AWL source from `Build/Monolith/`, or use the files from `Build/SplitImport/`.
+1. Import the rebuilt AWL source from `Build/Monolith/`, use the files from `Build/SplitImport/`, or import changed blocks from `Build/Patch/PATCH_BLOCKS.AWL`.
 2. Import the matching symbols file from the same `Build/` output set.
 3. Compile in STEP 7 only after both the block source and symbols are in sync.
 

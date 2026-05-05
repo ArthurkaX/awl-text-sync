@@ -14,7 +14,7 @@ try:
     from . import APP_NAME
     from .agent_docs import write_agent_docs
     from .call_graph import build_call_graph, default_call_graph_report_path, write_call_graph_report
-    from .builder import build_monolith, build_split_import
+    from .builder import build_monolith, build_patch, build_split_import
     from .config import (
         WorkspacePaths,
         resolve_exported_monolith_path,
@@ -30,7 +30,7 @@ except ImportError:  # pragma: no cover - script/PyInstaller fallback
     from awl_text_sync import APP_NAME
     from awl_text_sync.agent_docs import write_agent_docs
     from awl_text_sync.call_graph import build_call_graph, default_call_graph_report_path, write_call_graph_report
-    from awl_text_sync.builder import build_monolith, build_split_import
+    from awl_text_sync.builder import build_monolith, build_patch, build_split_import
     from awl_text_sync.config import (
         WorkspacePaths,
         resolve_exported_monolith_path,
@@ -71,6 +71,11 @@ def _run_build_split(paths: WorkspacePaths) -> str:
 def _run_build_monolith(paths: WorkspacePaths) -> str:
     count = build_monolith(paths)
     return f"Built monolith with {count} blocks at {paths.build_all_blocks}"
+
+
+def _run_build_patch(paths: WorkspacePaths) -> str:
+    count = build_patch(paths)
+    return f"Built patch with {count} changed block(s) at {paths.build_patch_blocks}"
 
 
 def _run_call_graph(paths: WorkspacePaths) -> str:
@@ -210,7 +215,7 @@ def _help_text() -> str:
         "2. Put one exported .AWL file and one .sdf file into Exported/.\n"
         "3. Click Split.\n"
         "4. Edit files in Project/Blocks.\n"
-        "5. Use Validate, Build Split, or Build Monolith.\n\n"
+        "5. Use Validate, Build Split, Build Monolith, or Build Patch.\n\n"
         "Tip:\n"
         "You may also select the Exported folder itself. The app will use its parent as the workspace root."
     )
@@ -263,7 +268,8 @@ def _help_steps() -> list[tuple[str, str]]:
             "Then use:\n"
             "- Validate: check the workspace\n"
             "- Build Split: create split import output\n"
-            "- Build Monolith: rebuild one ALL_BLOCKS.AWL file",
+            "- Build Monolith: rebuild one ALL_BLOCKS.AWL file\n"
+            "- Build Patch: create one AWL file with changed blocks only",
         ),
     ]
 
@@ -276,6 +282,7 @@ def _workspace_structure_description(paths: WorkspacePaths) -> str:
         f"- Project/Blocks: generated editable AWL block files\n"
         f"- Project/Symbols: copied symbol files used by validate/build\n"
         f"- Build/Monolith: rebuilt ALL_BLOCKS.AWL output\n"
+        f"- Build/Patch: changed-block PATCH_BLOCKS.AWL output\n"
         f"- Build/SplitImport: split import-ready output\n\n"
         "Do you want to create this folder structure now?"
     )
@@ -365,6 +372,7 @@ class SyncUiApp:
             ("Call Graph", _run_call_graph),
             ("Build Split", _run_build_split),
             ("Build Monolith", _run_build_monolith),
+            ("Build Patch", _run_build_patch),
         ]
         for label, handler in actions:
             button = tk.Button(
@@ -514,6 +522,7 @@ class SyncUiApp:
                 "Call Graph": build_ready,
                 "Build Split": build_ready,
                 "Build Monolith": build_ready,
+                "Build Patch": build_ready and split_ready,
                 "Create Agent Docs": paths.root.exists(),
             }
         except Exception as exc:
@@ -553,6 +562,7 @@ class SyncUiApp:
             paths.project_blocks_dir,
             paths.project_symbols_dir,
             paths.build_monolith_dir,
+            paths.build_patch_dir,
             paths.build_split_blocks_dir,
             paths.build_split_symbols_dir,
         ):

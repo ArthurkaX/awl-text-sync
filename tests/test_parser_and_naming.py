@@ -5,7 +5,7 @@ import unittest
 from pathlib import Path
 from uuid import uuid4
 
-from awl_text_sync.builder import build_monolith, build_split_import
+from awl_text_sync.builder import build_monolith, build_patch, build_split_import
 from awl_text_sync.config import resolve_workspace
 from awl_text_sync.call_graph import build_call_graph, default_call_graph_report_path, write_call_graph_report
 from awl_text_sync.models import Block, slugify_symbol_name
@@ -350,6 +350,58 @@ END_FUNCTION
         self.assertIn("ORGANIZATION_BLOCK OB 1", split_block.read_text(encoding="cp1252"))
         split_symbols = next(paths.build_split_symbols_dir.glob("*.sdf"))
         self.assertIn("°C", split_symbols.read_text(encoding="cp1252"))
+
+    def test_build_patch_writes_only_changed_blocks(self) -> None:
+        root = self._write_workspace(str(self.test_root), "my_export.awl", NUMERIC_MONOLITH)
+        paths = resolve_workspace(root)
+        split_exported_workspace(paths)
+        block_path = paths.project_blocks_dir / "fc100_FC_Force_Inputs.awl"
+        block_path.write_text(
+            block_path.read_text(encoding="utf-8").replace("END_FUNCTION", "      // patched\nEND_FUNCTION"),
+            encoding="utf-8",
+            newline="",
+        )
+
+        count = build_patch(paths)
+
+        self.assertEqual(count, 1)
+        patch_text = paths.build_patch_blocks.read_text(encoding="cp1252")
+        self.assertIn("FUNCTION FC 100 : VOID", patch_text)
+        self.assertIn("// patched", patch_text)
+        self.assertNotIn("FUNCTION_BLOCK FB 68", patch_text)
+        self.assertNotIn("ORGANIZATION_BLOCK OB 1", patch_text)
+
+    def test_build_patch_writes_empty_file_when_no_blocks_changed(self) -> None:
+        root = self._write_workspace(str(self.test_root), "my_export.awl", NUMERIC_MONOLITH)
+        paths = resolve_workspace(root)
+        split_exported_workspace(paths)
+
+        count = build_patch(paths)
+
+        self.assertEqual(count, 0)
+        self.assertEqual(paths.build_patch_blocks.read_text(encoding="cp1252"), "")
+
+    def test_build_patch_includes_new_blocks(self) -> None:
+        root = self._write_workspace(str(self.test_root), "my_export.awl", NUMERIC_MONOLITH)
+        paths = resolve_workspace(root)
+        split_exported_workspace(paths)
+        (paths.project_blocks_dir / "fc101.awl").write_text(
+            """FUNCTION FC 101 : VOID
+TITLE =
+VERSION : 0.1
+BEGIN
+END_FUNCTION
+""",
+            encoding="utf-8",
+            newline="",
+        )
+
+        count = build_patch(paths)
+
+        self.assertEqual(count, 1)
+        patch_text = paths.build_patch_blocks.read_text(encoding="cp1252")
+        self.assertIn("FUNCTION FC 101 : VOID", patch_text)
+        self.assertNotIn("FUNCTION FC 100 : VOID", patch_text)
 
     def test_validate_rejects_non_cp1252_characters_before_build(self) -> None:
         symbols = '"FC_HELPER                ","FC    100   ","FC    100 ","GEN:                                                                            "\r\n'

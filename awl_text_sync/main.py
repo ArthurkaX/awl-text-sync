@@ -9,7 +9,7 @@ try:
     from . import APP_NAME
     from .agent_docs import write_agent_docs
     from .call_graph import build_call_graph, default_call_graph_report_path, write_call_graph_report
-    from .builder import build_monolith, build_split_import
+    from .builder import build_monolith, build_patch, build_split_import
     from .config import resolve_workspace
     from .splitter import split_exported_workspace
     from .ui import launch_ui
@@ -19,7 +19,7 @@ except ImportError:  # pragma: no cover - script/PyInstaller fallback
     from awl_text_sync import APP_NAME
     from awl_text_sync.agent_docs import write_agent_docs
     from awl_text_sync.call_graph import build_call_graph, default_call_graph_report_path, write_call_graph_report
-    from awl_text_sync.builder import build_monolith, build_split_import
+    from awl_text_sync.builder import build_monolith, build_patch, build_split_import
     from awl_text_sync.config import resolve_workspace
     from awl_text_sync.splitter import split_exported_workspace
     from awl_text_sync.ui import launch_ui
@@ -124,6 +124,17 @@ def build_parser() -> argparse.ArgumentParser:
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
 
+    subparsers.add_parser(
+        "build-patch",
+        parents=[workspace_parent],
+        help="Build changed blocks only under Build/Patch/",
+        description=(
+            "Compare Project/Blocks/ against the original Exported/*.AWL source\n"
+            "and write only changed or new blocks to Build/Patch/PATCH_BLOCKS.AWL."
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+
     agent_docs_parser = subparsers.add_parser(
         "init-agent-docs",
         parents=[workspace_parent],
@@ -189,6 +200,11 @@ def main() -> int:
     if args.command == "build-monolith":
         count = build_monolith(paths)
         print(f"Built monolith with {count} blocks at {paths.build_all_blocks}")
+        return 0
+
+    if args.command == "build-patch":
+        count = build_patch(paths)
+        print(f"Built patch with {count} changed block(s) at {paths.build_patch_blocks}")
         return 0
 
     if args.command == "init-agent-docs":

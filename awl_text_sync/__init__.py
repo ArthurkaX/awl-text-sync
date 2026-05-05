@@ -1,6 +1,6 @@
 """Core package for STEP 7 text sync workflows."""
 
-from .builder import build_monolith, build_split_import
+from .builder import build_monolith, build_patch, build_split_import
 from .splitter import split_exported_workspace
 from .validator import validate_workspace
 
@@ -19,6 +19,7 @@ __all__ = [
     "APP_NAME",
     "__version__",
     "build_monolith",
+    "build_patch",
     "build_split_import",
     "LEGACY_APP_NAME",
     "PACKAGE_NAME",

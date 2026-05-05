@@ -29,6 +29,7 @@ awl-text-sync <command> --help
 | `validate` | Parse all `.awl` blocks in `Project/Blocks/` and the `.sdf` symbols file in `Project/Symbols/` for syntax errors and consistency issues |
 | `build-split` | Build a set of individual `.awl` files and a `.sdf` file under `Build/SplitImport/`, ready for import into STEP 7 |
 | `build-monolith` | Combine all `Project/Blocks/*.awl` files into a single `ALL_BLOCKS.AWL` under `Build/Monolith/` |
+| `build-patch` | Compare `Project/Blocks/` against `Exported/*.AWL` and write changed or new blocks only to `Build/Patch/PATCH_BLOCKS.AWL` |
 | `init-agent-docs` | Create `AGENTS.md` and documentation files in the workspace root for AI coding agents |
 | `ui` | Launch the desktop GUI |
 
@@ -88,6 +89,8 @@ awl-text-sync <command> --help
    awl-text-sync build-monolith --workspace .
    # or
    awl-text-sync build-split --workspace .
+   # or
+   awl-text-sync build-patch --workspace .
    ```
 
 ## Safety
