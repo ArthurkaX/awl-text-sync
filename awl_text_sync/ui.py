@@ -215,7 +215,7 @@ def _help_text() -> str:
         "2. Put one exported .AWL file and one .sdf file into Exported/.\n"
         "3. Click Split.\n"
         "4. Edit files in Project/Blocks.\n"
-        "5. Use Validate, Build Split, Build Monolith, or Build Patch.\n\n"
+        "5. Use Validate, Call Graph, Build Split, Build Monolith, or Build Patch.\n\n"
         "Tip:\n"
         "You may also select the Exported folder itself. The app will use its parent as the workspace root."
     )
@@ -225,51 +225,50 @@ def _help_steps() -> list[tuple[str, str]]:
     return [
         (
             "Welcome",
-            f"{APP_NAME} works with one workspace folder.\n\n"
-            "It helps you split a STEP 7 export into editable files, validate the result, "
-            "and build output for import again.",
+            f"{APP_NAME} turns a STEP 7 text export into a small editable workspace.\n\n"
+            "The normal flow is: export from STEP 7, split, edit, validate, build, "
+            "then import the generated output back into STEP 7.",
         ),
         (
-            "Workspace",
-            "A workspace normally contains three folders:\n\n"
-            "- Exported/: files exported from STEP 7\n"
-            "- Project/: generated editable files\n"
-            "- Build/: generated output files\n\n"
-            "You select the workspace root folder in the main window.",
+            "Choose Workspace",
+            "Select the workspace root folder in the main window.\n\n"
+            "The app uses three folders inside it:\n"
+            "- Exported: original STEP 7 export files\n"
+            "- Project: editable block files and symbols\n"
+            "- Build: generated STEP 7 import files",
         ),
         (
-            "Export From STEP 7",
-            "In STEP 7, generate source blocks and include all editable blocks.\n\n"
-            "Use one source containing all selected blocks.\n"
-            "Export symbols separately as one .sdf file.",
+            "Prepare Export",
+            "Put exactly one exported .AWL file and one .sdf symbols file into Exported.\n\n"
+            "You can also select the Exported folder itself. The app will use its parent "
+            "as the workspace root.",
         ),
         (
             "Address Mode",
-            "In the Generate Source Blocks dialog, pay attention to Addresses:\n\n"
-            "- Absolute: numeric block headers\n"
-            "- Symbolic: symbolic block headers\n\n"
-            f"{APP_NAME} supports both modes.",
-        ),
-        (
-            "Prepare Files",
-            "Put one exported .AWL file and one .sdf file into Exported/.\n\n"
-            "You may also select the Exported folder itself in the app. "
-            "The app will use its parent as the workspace root.",
+            "When generating source blocks in STEP 7, check the Addresses option.\n\n"
+            "Absolute exports use numeric block headers. Symbolic exports use block names. "
+            f"{APP_NAME} supports both modes when the symbols file is present.",
         ),
         (
             "Split",
-            "Click Split.\n\n"
-            "The app creates editable AWL block files in Project/Blocks and copies "
-            "the symbol file into Project/Symbols.",
+            "Click Split once the export files are ready.\n\n"
+            "Split creates one editable AWL file per block under Project/Blocks and copies "
+            "the symbols file into Project/Symbols.\n\n"
+            "If Project/Blocks already has AWL files, the app asks before repeating Split "
+            "because local edits may be overwritten.",
         ),
         (
-            "Edit And Build",
-            "Edit files in Project/Blocks.\n\n"
-            "Then use:\n"
-            "- Validate: check the workspace\n"
-            "- Build Split: create split import output\n"
-            "- Build Monolith: rebuild one ALL_BLOCKS.AWL file\n"
-            "- Build Patch: create one AWL file with changed blocks only",
+            "Edit And Check",
+            "Edit only the files under Project/Blocks unless you intentionally need a symbol change.\n\n"
+            "Click Validate before building. Use Call Graph when you want an HTML report showing "
+            "which blocks call each other.",
+        ),
+        (
+            "Build Output",
+            "Choose the output shape you need:\n\n"
+            "- Build Split: separate import-ready block files\n"
+            "- Build Monolith: one complete ALL_BLOCKS.AWL\n"
+            "- Build Patch: one PATCH_BLOCKS.AWL with only changed or new blocks",
         ),
     ]
 

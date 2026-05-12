@@ -64,7 +64,6 @@ def build_parser() -> argparse.ArgumentParser:
 
     subparsers = parser.add_subparsers(
         dest="command",
-        required=True,
         title="commands",
     )
 
@@ -166,6 +165,10 @@ def main() -> int:
     parser = build_parser()
     args = parser.parse_args()
     paths = resolve_workspace(args.workspace)
+
+    if args.command is None:
+        launch_ui(args.workspace)
+        return 0
 
     if args.command == "split":
         count = split_exported_workspace(paths)

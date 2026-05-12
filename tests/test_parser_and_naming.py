@@ -8,6 +8,7 @@ from uuid import uuid4
 from awl_text_sync.builder import build_monolith, build_patch, build_split_import
 from awl_text_sync.config import resolve_workspace
 from awl_text_sync.call_graph import build_call_graph, default_call_graph_report_path, write_call_graph_report
+from awl_text_sync.main import build_parser
 from awl_text_sync.models import Block, slugify_symbol_name
 from awl_text_sync.parser import ParseError
 from awl_text_sync.splitter import split_exported_workspace
@@ -200,6 +201,10 @@ class WorkspaceSplitTests(unittest.TestCase):
 
     def tearDown(self) -> None:
         shutil.rmtree(self.test_root, ignore_errors=True)
+
+    def test_cli_accepts_no_command_for_default_ui_launch(self) -> None:
+        args = build_parser().parse_args([])
+        self.assertIsNone(args.command)
 
     def _write_workspace(self, tmp: str, monolith_name: str, monolith_text: str, symbols_text: str = SYMBOLS_SDF) -> Path:
         root = Path(tmp)
@@ -493,7 +498,7 @@ END_FUNCTION_BLOCK
         validated = validate_workspace(paths)
         self.assertEqual(len(validated), 1)
 
-    def test_validate_accepts_symbolic_db_with_absolute_offset(self) -> None:
+    def test_validate_rejects_symbolic_db_with_absolute_offset(self) -> None:
         symbols = '"FB_SORTER                ","FB      1   ","FB      1 ","GEN:                                                                            "\r\n'
         root = self._write_workspace(
             str(self.test_root),
@@ -513,10 +518,10 @@ END_FUNCTION_BLOCK
         )
         paths = resolve_workspace(root)
         split_exported_workspace(paths)
-        validated = validate_workspace(paths)
-        self.assertEqual(len(validated), 1)
+        with self.assertRaisesRegex(ParseError, r"mixed symbolic/absolute DB access"):
+            validate_workspace(paths)
 
-    def test_validate_accepts_absolute_db_with_symbolic_field(self) -> None:
+    def test_validate_rejects_absolute_db_with_symbolic_field(self) -> None:
         symbols = '"FB_SORTER                ","FB      1   ","FB      1 ","GEN:                                                                            "\r\n'
         root = self._write_workspace(
             str(self.test_root),
@@ -536,8 +541,8 @@ END_FUNCTION_BLOCK
         )
         paths = resolve_workspace(root)
         split_exported_workspace(paths)
-        validated = validate_workspace(paths)
-        self.assertEqual(len(validated), 1)
+        with self.assertRaisesRegex(ParseError, r"mixed symbolic/absolute DB access"):
+            validate_workspace(paths)
 
     def test_validate_accepts_absolute_pointer_literals(self) -> None:
         symbols = '"FB_SORTER                ","FB      1   ","FB      1 ","GEN:                                                                            "\r\n'
@@ -909,7 +914,7 @@ NETWORK
 TITLE =
       CALL FC 100 (
            i_Any := DB1.DBX0.0,
-           i_Any2 := DB1.Number);
+           i_Any2 := DB1.DBW2);
 END_FUNCTION_BLOCK
 """
         root = self._write_workspace(str(self.test_root), "stl_validate.awl", monolith, symbols_text="\r\n")

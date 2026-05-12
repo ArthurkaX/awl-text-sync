@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 import re
 from pathlib import Path
 
@@ -33,12 +32,6 @@ POINTER_LITERAL_PATTERN = re.compile(
     r"\bP#(?P<target>(?:DB\d+\.\s*DB[XBWD]\s*\d+(?:\.\d+)?|DB[XBWD]\s*\d+\.\d+|[A-Z]{1,3}\s*\d+\.\d+|\d+\.\d+|P\s+0\.0|0\.0|#[A-Za-z_][A-Za-z0-9_]*))(?:\s+(?P<data_type>BIT|BYTE|WORD|DWORD)\s+(?P<count>\d+))?\b",
     re.IGNORECASE,
 )
-BODY_LABEL_PATTERN = re.compile(r"^(?P<label>[A-Za-z_][A-Za-z0-9_]*)\s*:\s*(?P<rest>.*)$")
-JUMP_PATTERN = re.compile(
-    r"^(?P<opcode>JU|JC|JCN|JBI|JNBI|JZ|JN|JP|JM|LOOP)\b(?:\s+(?P<target>[A-Za-z_][A-Za-z0-9_]*))?\s*;?\s*$",
-    re.IGNORECASE,
-)
-CALL_START_PATTERN = re.compile(r"^(?:(?P<label>[A-Za-z_][A-Za-z0-9_]*)\s*:\s*)?CALL\b", re.IGNORECASE)
 CALL_HEADER_PATTERN = re.compile(
     r"^(?:(?P<label>[A-Za-z_][A-Za-z0-9_]*)\s*:\s*)?CALL\s+(?P<target>(?:SFB|SFC|FB|FC|OB)\s+\d+|#?[A-Za-z_][A-Za-z0-9_]*|\"[^\"]+\")(?P<tail>.*)$",
     re.IGNORECASE,
@@ -46,25 +39,6 @@ CALL_HEADER_PATTERN = re.compile(
 CALL_INSTANCE_PATTERN = re.compile(r"^\s*,\s*(?P<kind>DB|DI)\s+(?P<number>\d+)\b", re.IGNORECASE)
 CALL_PARAM_PATTERN = re.compile(r"(?P<name>[A-Za-z_][A-Za-z0-9_]*)\s*:=")
 LOCAL_INSTANCE_PATTERN = re.compile(r"^#(?P<name>[A-Za-z_][A-Za-z0-9_]*)$")
-DECL_SECTION_HEADERS = {"VAR_INPUT", "VAR_OUTPUT", "VAR_IN_OUT"}
-BLOCK_INSTANCE_DECL_PATTERN = re.compile(
-    r'^(?P<name>[A-Za-z_][A-Za-z0-9_]*)\s*:\s*(?:(?P<kind>FB|FC|OB|SFB|SFC)\s+(?P<number>\d+)|"(?P<quoted_name>[^"]+)")\s*;\s*$',
-    re.IGNORECASE,
-)
-BLOCK_TYPE_PATTERN = re.compile(r"^(?P<kind>FB|FC|OB|SFB|SFC)\s+(?P<number>\d+)$", re.IGNORECASE)
-QUOTED_BLOCK_PATTERN = re.compile(r'^"(?P<name>[^"]+)"$')
-LOCAL_INSTANCE_PATTERN = re.compile(r"^#(?P<name>[A-Za-z_][A-Za-z0-9_]*)$")
-INTERFACE_NAME_PATTERN = re.compile(r"^(?P<name>[A-Za-z_][A-Za-z0-9_]*)\s*:")
-SECTION_HEADER_PATTERN = re.compile(r"^(VAR_INPUT|VAR_OUTPUT|VAR_IN_OUT|VAR|VAR_TEMP|END_VAR|BEGIN)$", re.IGNORECASE)
-STATEMENT_END_PATTERN = re.compile(r";\s*$")
-LABEL_ONLY_PATTERN = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
-
-
-@dataclass(frozen=True)
-class BlockDeclarationIndex:
-    interface_parameters: frozenset[str]
-    local_block_instances: dict[str, tuple[str, int | None]]
-
 
 class ValidationErrorReport(ParseError):
     def __init__(self, errors: list[str]) -> None:
@@ -127,137 +101,18 @@ def _iter_block_body_lines(source: str) -> list[tuple[int, str]]:
     return body_lines
 
 
-def _iter_block_header_lines(source: str) -> list[str]:
-    header_lines: list[str] = []
-    for raw_line in source.splitlines():
-        code_part = raw_line.split("//", 1)[0].strip()
-        if not code_part:
-            continue
-        if code_part == "BEGIN":
-            break
-        header_lines.append(code_part)
-    return header_lines
-
-
-def _build_block_declaration_index(block_source: str) -> BlockDeclarationIndex:
-    interface_parameters: set[str] = set()
-    local_block_instances: dict[str, tuple[str, int | None]] = {}
-    current_section: str | None = None
-
-    for raw_line in _iter_block_header_lines(block_source):
-        section_name = raw_line.upper()
-        if section_name in {"VAR_INPUT", "VAR_OUTPUT", "VAR_IN_OUT", "VAR", "VAR_TEMP"}:
-            current_section = section_name
-            continue
-        if section_name == "END_VAR":
-            current_section = None
-            continue
-        if section_name.startswith("TITLE") or section_name.startswith("NAME") or section_name.startswith("VERSION"):
-            continue
-
-        if current_section in DECL_SECTION_HEADERS:
-            interface_match = INTERFACE_NAME_PATTERN.match(raw_line)
-            if interface_match:
-                interface_parameters.add(interface_match.group("name"))
-        if current_section in {"VAR", "VAR_TEMP"}:
-            instance_match = BLOCK_INSTANCE_DECL_PATTERN.match(raw_line)
-            if instance_match:
-                quoted_name = instance_match.group("quoted_name")
-                if quoted_name is not None:
-                    local_block_instances[instance_match.group("name")] = ("QUOTED", None)
-                else:
-                    local_block_instances[instance_match.group("name")] = (
-                        instance_match.group("kind").upper(),
-                        int(instance_match.group("number")),
-                    )
-
-    return BlockDeclarationIndex(
-        interface_parameters=frozenset(interface_parameters),
-        local_block_instances=local_block_instances,
-    )
-
-
-def _normalize_call_target(target: str) -> tuple[str, str | None, int | None]:
-    local_match = LOCAL_INSTANCE_PATTERN.fullmatch(target)
-    if local_match:
-        return "LOCAL_INSTANCE", local_match.group("name"), None
-
-    quoted_match = QUOTED_BLOCK_PATTERN.fullmatch(target)
-    if quoted_match:
-        return "QUOTED", quoted_match.group("name"), None
-
-    block_type_match = BLOCK_TYPE_PATTERN.fullmatch(target)
-    if block_type_match:
-        return block_type_match.group("kind").upper(), None, int(block_type_match.group("number"))
-
-    return "UNKNOWN", target, None
-
-
-def _collect_labels_and_jumps(body_lines: list[tuple[int, str]]) -> tuple[dict[str, int], list[tuple[int, str]]]:
-    labels: dict[str, int] = {}
-    jumps: list[tuple[int, str]] = []
-
-    for line_number, line in body_lines:
-        if ":=" in line:
-            jump_match = JUMP_PATTERN.fullmatch(line)
-            if jump_match:
-                target = jump_match.group("target")
-                if not target:
-                    raise ParseError(f"Missing jump target on line {line_number}")
-                jumps.append((line_number, target))
-            continue
-
-        match = BODY_LABEL_PATTERN.match(line)
-        if match:
-            label = match.group("label")
-            if label in labels:
-                raise ParseError(f"Duplicate label detected: {label} (line {line_number})")
-            labels[label] = line_number
-            line = match.group("rest").strip()
-            if not line:
-                continue
-
-        jump_match = JUMP_PATTERN.fullmatch(line)
-        if jump_match:
-            target = jump_match.group("target")
-            if not target:
-                raise ParseError(f"Missing jump target on line {line_number}")
-            jumps.append((line_number, target))
-
-    return labels, jumps
-
-
-def _collect_call_statements(body_lines: list[tuple[int, str]]) -> list[tuple[int, str]]:
-    call_statements: list[tuple[int, str]] = []
-    index = 0
-    while index < len(body_lines):
-        line_number, line = body_lines[index]
-        if not CALL_START_PATTERN.match(line):
-            index += 1
-            continue
-
-        statement_lines = [line]
-        statement = line
-        paren_depth = line.count("(") - line.count(")")
-        while not STATEMENT_END_PATTERN.search(statement) or paren_depth > 0:
-            index += 1
-            if index >= len(body_lines):
-                break
-            next_line_number, next_line = body_lines[index]
-            statement_lines.append(next_line)
-            statement += " " + next_line
-            paren_depth += next_line.count("(") - next_line.count(")")
-            if STATEMENT_END_PATTERN.search(statement) and paren_depth <= 0:
-                break
-
-        call_statements.append((line_number, " ".join(statement_lines)))
-        index += 1
-
-    return call_statements
-
-
 def _validate_db_access_consistency(path: Path, block_source: str) -> None:
-    return
+    for line_number, line in _iter_block_body_lines(block_source):
+        for match in DB_ACCESS_PATTERN.finditer(line):
+            left = match.group("left")
+            right = match.group("right")
+            left_is_absolute = _is_absolute_db_reference(left)
+            right_is_absolute = _is_absolute_db_selector(right)
+            if left_is_absolute == right_is_absolute:
+                continue
+            raise ParseError(
+                f"{path.name}: mixed symbolic/absolute DB access on line {line_number}: {match.group(0)}"
+            )
 
 
 def _validate_pointer_literals(path: Path, block_source: str) -> None:

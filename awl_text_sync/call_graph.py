@@ -710,7 +710,7 @@ function renderSearchStatus(filtered, exactMatch) {{
   status.textContent = `${{filtered.length}} match${{filtered.length === 1 ? '' : 'es'}} for "${{state.query}}"${{exact}}`;
 }}
 
-const DEBUG_CALL_GRAPH = true;
+const DEBUG_CALL_GRAPH = false;
 
 function debugLog(message, payload = null) {{
   if (!DEBUG_CALL_GRAPH || typeof console === 'undefined' || typeof console.debug !== 'function') return;
