@@ -1,5 +1,14 @@
 # awl-text-sync
 
+[![CI](https://github.com/ArthurkaX/awl-text-sync/actions/workflows/tests.yml/badge.svg)](https://github.com/ArthurkaX/awl-text-sync/actions/workflows/tests.yml)
+[![Release](https://img.shields.io/github/v/release/ArthurkaX/awl-text-sync?include_prereleases&sort=semver)](https://github.com/ArthurkaX/awl-text-sync/releases)
+[![Downloads](https://img.shields.io/github/downloads/ArthurkaX/awl-text-sync/total)](https://github.com/ArthurkaX/awl-text-sync/releases)
+[![Stars](https://img.shields.io/github/stars/ArthurkaX/awl-text-sync?style=flat)](https://github.com/ArthurkaX/awl-text-sync/stargazers)
+[![Forks](https://badgen.net/github/forks/ArthurkaX/awl-text-sync)](https://github.com/ArthurkaX/awl-text-sync/forks)
+[![Issues](https://img.shields.io/github/issues/ArthurkaX/awl-text-sync)](https://github.com/ArthurkaX/awl-text-sync/issues)
+[![Last commit](https://img.shields.io/github/last-commit/ArthurkaX/awl-text-sync)](https://github.com/ArthurkaX/awl-text-sync/commits/main)
+[![License](https://img.shields.io/github/license/ArthurkaX/awl-text-sync)](LICENSE)
+
 Turn exported STEP 7 AWL projects into a clean, git-friendly workspace you can actually work with.
 
 `awl-text-sync` splits monolithic STEP 7 exports into editable per-block files, validates changes before import, and rebuilds STEP 7-ready output from the same workspace. If you maintain legacy PLC code, review changes in git, or need a safer way to edit and analyze exported projects on Windows, this tool removes a lot of friction.
