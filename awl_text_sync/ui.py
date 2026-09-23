@@ -187,9 +187,9 @@ def _summarize_workspace(paths: WorkspacePaths) -> tuple[str, bool]:
         except FileExistsError as exc:
             summary = str(exc)
         except FileNotFoundError:
-            summary = "Exported/ found. Add exactly one .AWL file and one .sdf file."
+            summary = "Exported/ found. Add a combined ALL.AWL (or ALL_BLOCKS.AWL) export and one .sdf file."
     elif exported_present:
-        summary = "Exported/ found. Add exactly one .AWL file and one .sdf file."
+        summary = "Exported/ found. Add ALL.AWL (or ALL_BLOCKS.AWL) and one .sdf file."
     else:
         summary = "Select a workspace root or use Help for the expected folder structure."
     return summary, split_ready
@@ -199,7 +199,7 @@ def _help_text() -> str:
     return (
         f"{APP_NAME} works with one workspace folder.\n\n"
         "Workspace folders:\n"
-        "- Exported/: files exported from STEP 7\n"
+        "- Exported/: STEP 7 exports; optional .SCL and individual .AWL sources are supported\n"
         "- Project/: generated editable files\n"
         "- Build/: generated output files\n\n"
         "How to export from STEP 7:\n"
@@ -212,7 +212,8 @@ def _help_text() -> str:
         f"7. {APP_NAME} supports both modes.\n\n"
         "How to use this app:\n"
         "1. Choose the workspace root folder.\n"
-        "2. Put one exported .AWL file and one .sdf file into Exported/.\n"
+        "2. Put the combined ALL.AWL (or ALL_BLOCKS.AWL) export and one .sdf file into Exported/. "
+        "Optional .SCL and individual .AWL sources are copied into Project/Source.\n"
         "3. Click Split.\n"
         "4. Edit files in Project/Blocks.\n"
         "5. Use Validate, Call Graph, Build Split, Build Monolith, or Build Patch.\n\n"
@@ -239,7 +240,8 @@ def _help_steps() -> list[tuple[str, str]]:
         ),
         (
             "Prepare Export",
-            "Put exactly one exported .AWL file and one .sdf symbols file into Exported.\n\n"
+            "Put the combined ALL.AWL (or ALL_BLOCKS.AWL) export and one .sdf symbols file into Exported. "
+            "Optional .SCL and individual .AWL sources are copied into Project/Source.\n\n"
             "You can also select the Exported folder itself. The app will use its parent "
             "as the workspace root.",
         ),
@@ -277,7 +279,8 @@ def _workspace_structure_description(paths: WorkspacePaths) -> str:
     return (
         f"Create standard workspace folders in:\n{paths.root}\n\n"
         "Folders:\n"
-        f"- Exported: put exactly one .AWL export and one .sdf symbols file here\n"
+        f"- Exported: put a combined ALL.AWL (or ALL_BLOCKS.AWL) export and one .sdf symbols file here; "
+        "optional .SCL and individual .AWL sources are allowed\n"
         f"- Project/Blocks: generated editable AWL block files\n"
         f"- Project/Symbols: copied symbol files used by validate/build\n"
         f"- Build/Monolith: rebuilt ALL_BLOCKS.AWL output\n"

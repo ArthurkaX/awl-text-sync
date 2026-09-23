@@ -25,7 +25,7 @@ awl-text-sync <command> --help
 
 | Command | Description |
 |---|---|
-| `split` | Split `Exported/*.AWL` into individual block files under `Project/Blocks/` and copy the `.sdf` symbols file to `Project/Symbols/` |
+| `split` | Split `ALL.AWL` or `ALL_BLOCKS.AWL` from `Exported/` into `Project/Blocks/`, copy `.sdf` to `Project/Symbols/`, and copy optional `.SCL` / individual `.AWL` sources to `Project/Source/` |
 | `validate` | Parse all `.awl` blocks in `Project/Blocks/` and the `.sdf` symbols file in `Project/Symbols/` for syntax errors and consistency issues |
 | `build-split` | Build a set of individual `.awl` files and a `.sdf` file under `Build/SplitImport/`, ready for import into STEP 7 |
 | `build-monolith` | Combine all `Project/Blocks/*.awl` files into a single `ALL_BLOCKS.AWL` under `Build/Monolith/` |
@@ -51,6 +51,7 @@ awl-text-sync <command> --help
 ## Workspace Layout
 
 - `Exported/` contains original STEP 7 exports. Do not edit it.
+- `Project/Source/` keeps copied SCL and individual AWL sources for blocks with higher level source versions.
 - `Project/Blocks/` contains editable AWL block files.
 - `Project/Symbols/` contains the active symbol table.
 - `Build/` contains generated output. Do not edit it.

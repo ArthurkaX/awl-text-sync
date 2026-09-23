@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import replace
 import ctypes
 import re
+import shutil
 import stat
 import time
 from pathlib import Path
@@ -64,6 +65,14 @@ def split_exported_workspace(paths: WorkspacePaths) -> int:
     ensure_workspace_rules(paths.root)
     ensure_directory(paths.project_blocks_dir)
     ensure_directory(paths.project_symbols_dir)
+    ensure_directory(paths.project_source_dir)
+
+    for source_path in sorted(paths.exported_dir.iterdir()):
+        if not source_path.is_file() or source_path == monolith_source:
+            continue
+        if source_path.suffix.lower() not in {".awl", ".scl"}:
+            continue
+        shutil.copy2(source_path, paths.project_source_dir / source_path.name)
 
     symbol_index = load_symbol_index(exported_symbols)
     reverse_symbol_index = load_reverse_symbol_index(exported_symbols)

@@ -77,9 +77,9 @@ python -m awl_text_sync ui
 ## Quick Start
 
 1. Export from STEP 7:
-   - one `.AWL` source
+   - the combined `ALL.AWL` or `ALL_BLOCKS.AWL` source
    - one `.sdf` symbols file
-   - place both files in `Exported/`
+   - place the combined `ALL.AWL` (or `ALL_BLOCKS.AWL`) export and `.sdf` in `Exported/`; optional `.SCL` and individual `.AWL` sources are allowed
 2. Split the exported project into editable files:
 
 ```powershell
@@ -171,6 +171,7 @@ workspace/
   Exported/
   Project/
     Blocks/
+    Source/
     Symbols/
   Build/
     Monolith/
@@ -179,8 +180,9 @@ workspace/
     Reports/
 ```
 
-- `Exported/` contains the original STEP 7 handoff files.
+- `Exported/` contains the original STEP 7 handoff files. `ALL.AWL` or `ALL_BLOCKS.AWL` is selected as the combined export when other AWL/SCL source files are present.
 - `Project/Blocks/` contains editable AWL block files in `UTF-8`.
+- `Project/Source/` contains copied `.SCL` and individual `.AWL` source files for reference, including higher level SCL versions.
 - `Project/Symbols/` contains the copied `.sdf` used during validate and build, also normalized to `UTF-8`.
 - `Build/Monolith/` contains generated monolithic STEP 7 import output in `cp1252`.
 - `Build/Patch/` contains one generated `PATCH_BLOCKS.AWL` file with changed or new blocks only, in `cp1252`.

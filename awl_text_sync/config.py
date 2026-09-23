@@ -11,6 +11,7 @@ class WorkspacePaths:
     project_dir: Path
     project_blocks_dir: Path
     project_symbols_dir: Path
+    project_source_dir: Path
     build_dir: Path
     build_monolith_dir: Path
     build_split_dir: Path
@@ -39,7 +40,20 @@ def _find_single_file(directory: Path, suffix: str, label: str) -> Path:
 def resolve_exported_monolith_path(paths: WorkspacePaths) -> Path:
     if not paths.exported_dir.exists():
         raise FileNotFoundError(f"Missing exported directory: {paths.exported_dir}")
-    return _find_single_file(paths.exported_dir, ".awl", "monolith export")
+    candidates = sorted(
+        path for path in paths.exported_dir.iterdir() if path.is_file() and path.suffix.lower() == ".awl"
+    )
+    preferred = [path for path in candidates if path.stem.lower() in {"all", "all_blocks"}]
+    if len(preferred) == 1:
+        return preferred[0]
+    if not candidates:
+        raise FileNotFoundError(f"Missing monolith export: expected an .AWL file in {paths.exported_dir}")
+    if len(candidates) == 1:
+        return candidates[0]
+    names = ", ".join(path.name for path in candidates)
+    raise FileExistsError(
+        f"Multiple .AWL files found in {paths.exported_dir}; name the combined export ALL.AWL or ALL_BLOCKS.AWL: {names}"
+    )
 
 
 def resolve_exported_symbols_path(paths: WorkspacePaths) -> Path:
@@ -60,6 +74,7 @@ def resolve_workspace(root: str | Path | None = None) -> WorkspacePaths:
     project_dir = workspace_root / "Project"
     project_blocks_dir = project_dir / "Blocks"
     project_symbols_dir = project_dir / "Symbols"
+    project_source_dir = project_dir / "Source"
     build_dir = workspace_root / "Build"
     build_monolith_dir = build_dir / "Monolith"
     build_split_dir = build_dir / "SplitImport"
@@ -71,6 +86,7 @@ def resolve_workspace(root: str | Path | None = None) -> WorkspacePaths:
         project_dir=project_dir,
         project_blocks_dir=project_blocks_dir,
         project_symbols_dir=project_symbols_dir,
+        project_source_dir=project_source_dir,
         build_dir=build_dir,
         build_monolith_dir=build_monolith_dir,
         build_split_dir=build_split_dir,

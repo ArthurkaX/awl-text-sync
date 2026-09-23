@@ -1,6 +1,6 @@
 flowchart TD
-    A["STEP 7 Export<br/>Exported/*.AWL + Exported/*.sdf"] --> B["Split<br/>awl-text-sync split --workspace ."]
-    B --> C["Editable Workspace<br/>Project/Blocks + Project/Symbols"]
+    A["STEP 7 Export<br/>ALL.AWL + symbols + optional sources"] --> B["Split<br/>awl-text-sync split --workspace ."]
+    B --> C["Editable Workspace<br/>Project/Blocks + Project/Source + Project/Symbols"]
     C --> D["Edit Blocks<br/>change one .awl per block"]
     D --> E["Validate<br/>awl-text-sync validate --workspace ."]
 

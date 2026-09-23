@@ -70,12 +70,12 @@ def build_parser() -> argparse.ArgumentParser:
     subparsers.add_parser(
         "split",
         parents=[workspace_parent],
-        help="Split Exported/*.AWL into Project/Blocks/",
+        help="Split the combined Exported AWL into Project/Blocks/",
         description=(
-            "Read the single exported .AWL file from Exported/ and split it into\n"
+            "Read the combined ALL.AWL or ALL_BLOCKS.AWL export from Exported/ and split it into\n"
             "individual block files under Project/Blocks/.\n"
             "Each block gets a file named like fb68.awl.\n"
-            "Also copies the .sdf symbols file to Project/Symbols/."
+            "Also copies the .sdf symbols file to Project/Symbols/ and optional .SCL / individual .AWL sources to Project/Source/."
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )

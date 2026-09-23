@@ -4,9 +4,9 @@ This repository is a STEP 7 AWL text workspace. Keep it editable outside STEP 7,
 
 ## How The Project Works
 
-- Export one `.AWL` source and one `.sdf` symbol file from STEP 7.
+- Export a combined `ALL.AWL` or `ALL_BLOCKS.AWL` source and one `.sdf` symbol file from STEP 7. Optional `.SCL` and individual `.AWL` sources may be exported alongside them.
 - Prefer `Absolute` export for the smoothest automation path; `Symbolic` export also works if the symbol table is complete and consistent.
-- Run `split` to create the editable workspace under `Project/Blocks/` and `Project/Symbols/`.
+- Run `split` to create the editable workspace under `Project/Blocks/`, `Project/Source/`, and `Project/Symbols/`. Higher level `.SCL` versions are kept in `Project/Source/` for reference.
 - Edit block text files in `Project/Blocks/`.
 - Run `validate` before `build-split`, `build-monolith`, or STEP 7 import.
 - Keep `docs/validate_stl_rules.md` for detailed STL validation rules.
