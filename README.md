@@ -213,6 +213,16 @@ This writes:
 
 Existing files are skipped by default. Use `--force` only when you intentionally want to overwrite the generated agent docs.
 
+## Reference Project Check
+
+Use the optional reference-project check before changing parser, validator, call graph, or build behavior:
+
+```powershell
+python tools/check_reference_project.py C:\Workspace\Active\awl-text-sync-ref-proj
+```
+
+The script copies the reference project to a temporary workspace, then runs `validate`, `validate --call-graph`, `build-monolith`, and `build-split`. The source reference project is not modified. Add `--keep-copy` when you need to inspect the generated temporary workspace after a failure.
+
 ## Editing Rules
 
 - One block per `.awl` file.
