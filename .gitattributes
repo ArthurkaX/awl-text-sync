@@ -1,0 +1,8 @@
+# Store text with LF everywhere; stops CRLF churn from Windows-side edits.
+* text=auto eol=lf
+
+# cmd.exe mis-parses labels/goto in LF-only batch files, so keep them CRLF.
+*.bat text eol=crlf
+
+*.png binary
+*.gif binary
