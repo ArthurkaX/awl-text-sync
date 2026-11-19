@@ -300,7 +300,7 @@ class WorkspaceSplitTests(unittest.TestCase):
         exported = root / "Exported"
         (exported / "second.AWL").write_text(NUMERIC_MONOLITH.replace("\n", "\r\n"), encoding="cp1252")
         paths = resolve_workspace(root)
-        with self.assertRaisesRegex(FileExistsError, r"Multiple monolith export files"):
+        with self.assertRaisesRegex(FileExistsError, r"Multiple \.AWL files found in"):
             split_exported_workspace(paths)
 
     def test_split_rejects_multiple_sdf_files(self) -> None:
